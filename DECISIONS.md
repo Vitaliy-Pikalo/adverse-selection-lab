@@ -40,3 +40,7 @@ Append-only. Each entry: date, decision, reason, alternatives rejected.
 - **Reason:** A laptop or home PC sleeps, reboots and has no one to restart it; residential latency is higher and noisier, which contaminates recv-vs-exchange timing. Kalshi's API origin is reported to be AWS us-east-2.
 - **Rejected:** overnight-only laptop recording (hour-of-day sampling bias); home PC (needs in-person setup, no remote restart); 512 MB plan (OOM risk during replay).
 - **Cost to deadline:** ~$7–8. Delete the instance after Dec 14.
+
+## D9 — 2026-11-15 — Ed25519 key support
+- **Decision:** Auth accepts Ed25519 (Kalshi's current default) and RSA keys; signature algorithm follows the key type.
+- **Reason:** The VM's newly created key was Ed25519; the RSA-only loader would have failed at connect time.
