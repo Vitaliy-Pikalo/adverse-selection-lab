@@ -57,12 +57,62 @@ def _parse_time(s: str | None) -> float | None:
     return datetime.fromisoformat(s.replace("Z", "+00:00")).timestamp()
 
 
+def _f(v: object) -> float | None:
+    try:
+        return float(v) if v not in (None, "") else None  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+
+
+def is_live(m: dict, min_mid: float = 0.02, max_mid: float = 0.98) -> bool:
+    """Worth recording: it has traded, or it is quoted two-sided away from 0/1.
+
+    Far out-of-the-money strikes sit at 0/1¢ with no trades; they cost subscription slots and
+    disk but carry no adverse-selection information.
+    """
+    if (_f(m.get("volume_fp")) or _f(m.get("volume")) or 0) > 0:
+        return True
+    bid, ask = _f(m.get("yes_bid_dollars")), _f(m.get("yes_ask_dollars"))
+    if bid is None or ask is None or bid <= 0 or ask <= 0:
+        return False
+    return min_mid <= (bid + ask) / 2 <= max_mid
+
+
+def rank_key(m: dict, priority: set[str]) -> tuple:
+    vol = _f(m.get("volume_fp")) or _f(m.get("volume")) or 0.0
+    return (m.get("series_ticker") not in priority, -vol, m.get("close_time", ""))
+
+
+def select_markets(
+    ranked: list[dict], current: set[str], cap: int, priority: set[str]
+) -> list[str]:
+    """Priority series always; keep still-live current markets (avoids churn); fill by rank."""
+    out: list[str] = []
+    seen: set[str] = set()
+
+    def take(t: str) -> None:
+        if t not in seen and len(out) < cap:
+            seen.add(t)
+            out.append(t)
+
+    for m in ranked:
+        if m.get("series_ticker") in priority:
+            take(m["ticker"])
+    for m in ranked:
+        if m["ticker"] in current:
+            take(m["ticker"])
+    for m in ranked:
+        take(m["ticker"])
+    return out
+
+
 def discover_markets(
     rest: KalshiREST, cfg: CollectorConfig, now: float | None = None
 ) -> list[dict]:
-    """Open markets in cfg.series closing within the window, soonest first, capped."""
+    """Live open markets in cfg.series closing within the window, ranked (priority, volume)."""
     now = now or time.time()
     horizon = now + cfg.max_hours_to_close * 3600
+    priority = set(cfg.priority_series)
     found: list[dict] = []
     for series in cfg.series:
         try:
@@ -81,11 +131,13 @@ def discover_markets(
             it = list(rest.iter_markets(series_ticker=series, status="open"))
         for m in it:
             ct = _parse_time(m.get("close_time"))
-            if ct is not None and now < ct <= horizon:
-                m.setdefault("series_ticker", series)
+            if ct is None or not now < ct <= horizon:
+                continue
+            m.setdefault("series_ticker", series)
+            if series in priority or is_live(m, cfg.min_mid, cfg.max_mid):
                 found.append(m)
-    found.sort(key=lambda m: m.get("close_time", ""))
-    return found[: cfg.max_markets]
+    found.sort(key=lambda m: rank_key(m, priority))
+    return found
 
 
 class KalshiRecorder:
@@ -120,13 +172,18 @@ class KalshiRecorder:
 
     async def _markets(self) -> list[str]:
         markets = await asyncio.to_thread(self._discover)
+        chosen = select_markets(
+            markets, self.subscribed, self.cfg.max_markets, set(self.cfg.priority_series)
+        )
+        keep = set(chosen)
+        markets = [m for m in markets if m["ticker"] in keep]
         for m in markets:
             if m["ticker"] not in self.seen_info:
                 self.seen_info.add(m["ticker"])
                 self.writer.meta(
                     "market_info", market={k: m.get(k) for k in MARKET_INFO_FIELDS if k in m}
                 )
-        return [m["ticker"] for m in markets]
+        return chosen
 
     async def _send(self, ws, cmd: str, params: dict, channel: str | None = None) -> None:
         cid = self._next_id()

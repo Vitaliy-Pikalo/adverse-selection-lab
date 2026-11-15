@@ -58,6 +58,9 @@ class CollectorConfig:
     max_hours_to_close: float = 6
     max_markets: int = 400
     refresh_seconds: int = 120
+    priority_series: list[str] = field(default_factory=list)
+    min_mid: float = 0.02
+    max_mid: float = 0.98
     channels: list[str] = field(default_factory=lambda: ["orderbook_delta", "trade"])
     coinbase_products: list[str] = field(default_factory=lambda: ["BTC-USD", "ETH-USD"])
     coinbase_channels: list[str] = field(default_factory=lambda: ["ticker"])
@@ -77,6 +80,9 @@ def load_collector_config(path: str | Path) -> CollectorConfig:
         max_hours_to_close=k.get("max_hours_to_close", d.max_hours_to_close),
         max_markets=k.get("max_markets", d.max_markets),
         refresh_seconds=k.get("refresh_seconds", d.refresh_seconds),
+        priority_series=k.get("priority_series", d.priority_series),
+        min_mid=k.get("min_mid", d.min_mid),
+        max_mid=k.get("max_mid", d.max_mid),
         channels=k.get("channels", d.channels),
         coinbase_products=cb.get("products", d.coinbase_products),
         coinbase_channels=cb.get("channels", d.coinbase_channels),

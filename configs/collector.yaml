@@ -1,9 +1,14 @@
 # forward data collection config. changes here change the dataset -> log them in DECISIONS.md.
 kalshi:
-  series: [KXBTC, KXETH, KXBTCD, KXETHD]   # hourly range + hourly above/below
+  # 15-min up/down markets dominate volume (KXBTC15M ~395M contracts/day vs KXBTC ~0.9M);
+  # they are always subscribed. Hourly series fill the remaining slots by volume.
+  series: [KXBTC15M, KXETH15M, KXBTCD, KXETHD, KXBTC, KXETH]
+  priority_series: [KXBTC15M, KXETH15M]
   max_hours_to_close: 6        # subscribe to markets closing within this window
   max_markets: 400             # hard cap on subscribed markets
-  refresh_seconds: 120         # how often to discover new markets / drop closed ones
+  min_mid: 0.02                # untraded markets must be quoted inside [min_mid, max_mid]
+  max_mid: 0.98
+  refresh_seconds: 15          # a new 15-min market must be picked up within seconds
   channels: [orderbook_delta, trade]
 coinbase:
   products: [BTC-USD, ETH-USD]

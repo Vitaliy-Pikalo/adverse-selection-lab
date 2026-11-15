@@ -44,3 +44,10 @@ Append-only. Each entry: date, decision, reason, alternatives rejected.
 ## D9 — 2026-11-15 — Ed25519 key support
 - **Decision:** Auth accepts Ed25519 (Kalshi's current default) and RSA keys; signature algorithm follows the key type.
 - **Reason:** The VM's newly created key was Ed25519; the RSA-only loader would have failed at connect time.
+
+## D10 — 2026-11-15 — Center the study on 15-minute up/down markets
+- **Evidence (public API, settled markets in the 24 h to 2026-11-15 05:00 UTC):** KXBTC15M 96 events, 96/96 traded, 395.3M contracts; KXETH15M 25.9M; KXBTCD 44.7M (820 traded strikes); KXBTC 0.88M (526 traded of 4,404). KXBTC15M open market quoted 0.9760/0.9770 (sub-cent ticks).
+- **Decision:** Always subscribe KXBTC15M + KXETH15M; hourly series fill the remaining slots, ranked by volume, keeping already-subscribed live markets to avoid churn. Untraded markets must be quoted with mid in [0.02, 0.98]. Refresh every 15 s so each new 15-min market is captured from its first seconds.
+- **Reason:** 4× more independent events/day than hourly series and far more trades per event → more statistical power for Experiment B; a single strike per event that is a pure bet on short-horizon spot direction fits the stale-quote hypothesis (D2) directly.
+- **Rejected:** soonest-closing-first selection (filled 400 slots with dead strikes).
+- **Data boundary:** recordings before this deploy lack 15-min markets; the forward dataset for 15-min analysis starts at the deploy time logged in EXPERIMENT_LOG/PROJECT_STATUS.

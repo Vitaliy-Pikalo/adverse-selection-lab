@@ -7,7 +7,7 @@ import json
 from websockets.asyncio.server import serve
 
 from asl.config import CollectorConfig, KalshiCreds
-from asl.recorder.kalshi_ws import KalshiRecorder, discover_markets
+from asl.recorder.kalshi_ws import KalshiRecorder, discover_markets, select_markets
 from asl.recorder.writer import RawWriter
 from asl.replay import run
 
@@ -120,19 +120,49 @@ async def test_recorder_records_detects_gap_and_resubscribes(tmp_path, rsa_key_p
     assert rep["messages"]["orderbook_snapshot"] >= 2
 
 
-def test_discover_filters_window_and_caps():
+def test_discover_filters_window_liveness_and_ranks():
     class FakeRest:
         def iter_markets(self, **p):
             assert p["status"] == "open"
+            if p["series_ticker"] == "KXBTC15M":
+                return iter(
+                    [{"ticker": "up15", "close_time": "2026-01-01T00:15:00Z", "volume_fp": "0.00"}]
+                )  # priority: kept even with no volume yet
             return iter(
                 [
-                    {"ticker": "late", "close_time": "2026-01-01T10:00:00Z"},
-                    {"ticker": "soon", "close_time": "2026-01-01T01:00:00Z"},
-                    {"ticker": "out", "close_time": "2026-01-02T00:00:00Z"},
+                    {"ticker": "late", "close_time": "2026-01-01T10:00:00Z", "volume_fp": "5.00"},
+                    {"ticker": "busy", "close_time": "2026-01-01T02:00:00Z", "volume_fp": "900.00"},
+                    {
+                        "ticker": "dead",
+                        "close_time": "2026-01-01T01:00:00Z",
+                        "volume_fp": "0.00",
+                        "yes_bid_dollars": "0.0000",
+                        "yes_ask_dollars": "0.0100",
+                    },
+                    {
+                        "ticker": "quoted",
+                        "close_time": "2026-01-01T01:00:00Z",
+                        "volume_fp": "0.00",
+                        "yes_bid_dollars": "0.4000",
+                        "yes_ask_dollars": "0.4200",
+                    },
+                    {"ticker": "out", "close_time": "2026-01-02T00:00:00Z", "volume_fp": "99.00"},
                 ]
             )
 
     now = 1767225600  # 2026-01-01T00:00:00Z
-    cfg = CollectorConfig(series=["KXBTC"], max_hours_to_close=12, max_markets=1)
-    got = discover_markets(FakeRest(), cfg, now=now)
-    assert [m["ticker"] for m in got] == ["soon"]
+    cfg = CollectorConfig(
+        series=["KXBTC15M", "KXBTCD"], priority_series=["KXBTC15M"], max_hours_to_close=12
+    )
+    got = [m["ticker"] for m in discover_markets(FakeRest(), cfg, now=now)]
+    assert got == ["up15", "busy", "late", "quoted"]  # dead + out-of-window dropped
+
+
+def test_select_markets_priority_then_current_then_rank():
+    ranked = [
+        {"ticker": t, "series_ticker": s}
+        for t, s in [("p1", "P"), ("a", "X"), ("b", "X"), ("c", "X")]
+    ]
+    got = select_markets(ranked, current={"c"}, cap=3, priority={"P"})
+    assert got == ["p1", "c", "a"]  # current 'c' kept despite lower rank (no churn)
+    assert select_markets(ranked, set(), cap=2, priority={"P"}) == ["p1", "a"]
