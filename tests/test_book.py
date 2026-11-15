@@ -153,3 +153,21 @@ def test_reset_on_reconnect():
     # new connection restarts seq at 1 without a false gap
     ev = m.handle(snap(seq=1, yes=[["0.2200", "10.00"]]))
     assert [e.kind for e in ev] == ["book"]
+
+
+def test_update_subscription_ok_consumes_seq_without_false_gap():
+    m = BookManager()
+    m.handle({"type": "subscribed", "msg": {"channel": "orderbook_delta", "sid": 1}})
+    m.handle(snap(seq=1, yes=[["0.2200", "10.00"]]))
+    ev = m.handle({"type": "ok", "id": 9, "sid": 1, "seq": 2, "msg": {"market_tickers": ["T"]}})
+    assert [e.kind for e in ev] == ["ignored"]
+    ev = m.handle(delta(seq=3))
+    assert [e.kind for e in ev] == ["book"] and m.gaps == []
+
+
+def test_ok_reply_can_itself_reveal_a_gap():
+    m = BookManager()
+    m.handle({"type": "subscribed", "msg": {"channel": "orderbook_delta", "sid": 1}})
+    m.handle(snap(seq=1, yes=[["0.2200", "10.00"]]))
+    ev = m.handle({"type": "ok", "sid": 1, "seq": 5, "msg": {}})
+    assert [e.kind for e in ev] == ["gap", "invalid"] and not m.books["T"].valid

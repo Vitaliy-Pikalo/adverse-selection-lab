@@ -175,6 +175,20 @@ class BookManager:
 
     def handle(self, m: dict) -> list[Event]:
         typ = m.get("type")
+        # Control replies (e.g. "ok" to update_subscription, "unsubscribed") also consume a
+        # seq number on their subscription; skipping them would look like a gap.
+        if typ in ("ok", "unsubscribed") and m.get("sid") is not None and "seq" in m:
+            gap = self._check_seq(m["sid"], m["seq"])
+            if not gap:
+                return [Event("ignored", sid=m["sid"], detail={"type": typ})]
+            self.gaps.append(gap)
+            events = [Event("gap", sid=m["sid"], detail=gap)]
+            if self.sid_channel.get(m["sid"]) != "trade":
+                for t in self.sid_tickers.get(m["sid"], ()):
+                    if t in self.books:
+                        self.books[t].valid = False
+                        events.append(Event("invalid", ticker=t, sid=m["sid"]))
+            return events
         if typ == "subscribed":
             sid = m["msg"]["sid"]
             self.sid_channel[sid] = m["msg"].get("channel", "")
