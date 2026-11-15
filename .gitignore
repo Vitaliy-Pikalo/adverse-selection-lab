@@ -1,0 +1,23 @@
+# secrets
+.env
+*.pem
+*.key
+secrets/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# data (raw + derived are reproducible from the recorder/backfill, never commit)
+data/*
+!data/.gitkeep
+
+# logs
+*.log
+logs/

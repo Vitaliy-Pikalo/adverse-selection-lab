@@ -1,0 +1,14 @@
+# forward data collection config. changes here change the dataset -> log them in DECISIONS.md.
+kalshi:
+  series: [KXBTC, KXETH, KXBTCD, KXETHD]   # hourly range + hourly above/below
+  max_hours_to_close: 6        # subscribe to markets closing within this window
+  max_markets: 400             # hard cap on subscribed markets
+  refresh_seconds: 120         # how often to discover new markets / drop closed ones
+  channels: [orderbook_delta, trade]
+coinbase:
+  products: [BTC-USD, ETH-USD]
+  channels: [ticker]
+output:
+  dir: data/raw
+  rotate: hourly               # one file per source per UTC hour; closed files are gzipped
+  flush_seconds: 2
