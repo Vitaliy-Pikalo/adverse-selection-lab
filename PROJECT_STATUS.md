@@ -39,14 +39,20 @@
 - recv − exchange timestamp: p01 4.3 ms, p50 6.7 ms, p99 13.8 ms (includes VM↔exchange clock offset).
 - Raw volume ≈ 7 MB/min uncompressed (≈ 10 GB/day before gzip). 34 GB free. Compression ratio to be measured at first hourly rollover.
 
+## Deploys 2026-11-15 (UTC)
+- 05:01 `373a31f`: 15-min markets prioritized, liveness filter, 15 s refresh. Before this, selection had collapsed at 05:00 (all 400 slots were markets closing at 05:00).
+- 05:04 `aec4426`: fix false seq gaps on update_subscription `ok` replies (confirmed in raw log: `ok` seq N then snapshot N+1 flagged as gap). After deploy: 2 min, 0 gaps, 0 reconnects, 84 live markets.
+- **15-min forward dataset starts 2026-11-15 05:04 UTC.** Earlier raw data (04:51–05:04) is hourly-series only.
+
 ## Open issues
-- **Market cap binding:** 400 subscribed = `max_markets`. Soonest-closing markets win, so far-from-money dead strikes take slots. Fix: rank by proximity to spot / recent volume (M1.1).
-- **Disk budget:** verify gzip ratio; if < 5×, add pruning or move closed hours to cheaper storage.
+- **Disk (urgent within ~1 week):** with 15-min markets Kalshi traffic is ~138k msgs/min (vs ~15k before). Raw JSON ≈ 15–40 MB/min. gzip measured 17× on the 04:00 hour (old market mix); re-measure on the 05:00 hour. If ~3 GB/day compressed, 34 GB free lasts ~10 days, short of the Dec 7 freeze. Options: Lightsail block storage, nightly offload of closed hours, or lossless conversion of closed hours to zstd Parquet.
+- Hourly-series slots: 84 live markets total now, so the 400 cap is no longer binding.
 
 ## Uncertain
 - Real message rate, per-subscription market limit, whether `/markets` accepts `min_close_ts`/`max_close_ts` (fallback implemented).
 - Where the collector runs 24/7.
 
 ## Next
-1. Measure gzip ratio after the 05:00 UTC rollover; fix market selection (near-money first).
-2. When the 30-day backfill finishes: M2 trade markout labels.
+1. Measure gzip ratio on the 05:00 hour; pick the disk fix before ~Nov 20.
+2. Check the 30-day backfill completed; nightly processing job on the VM.
+3. M2: trade markout labels + Experiment A on the backfill (add KXBTC15M/KXETH15M to the backfill).
