@@ -4,7 +4,7 @@ import httpx
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from asl.kalshi.auth import auth_headers, load_private_key, sign
+from asl.kalshi.auth import auth_headers, key_type, load_private_key, sign
 from asl.kalshi.rest import KalshiREST
 
 
@@ -62,3 +62,22 @@ def test_rest_has_no_write_methods():
     # guardrail: this project must never be able to place orders
     for name in ("post", "put", "delete", "create_order", "place_order"):
         assert not hasattr(KalshiREST, name)
+
+
+def test_ed25519_signature_verifies(ed25519_key_path):
+    key = load_private_key(ed25519_key_path)
+    assert key_type(key) == "ed25519"
+    sig = sign(key, "1700000000000", "GET", "/trade-api/ws/v2")
+    key.public_key().verify(base64.b64decode(sig), b"1700000000000GET/trade-api/ws/v2")
+    assert len(base64.b64decode(sig)) == 64
+
+
+def test_ed25519_key_matches_kalshi_download_shape(ed25519_key_path):
+    lines = ed25519_key_path.read_text().splitlines()
+    assert lines[0] == "-----BEGIN PRIVATE KEY-----" and len(lines) == 3 and len(lines[1]) == 64
+
+
+def test_key_with_crlf_and_trailing_blank_lines_loads(ed25519_key_path, tmp_path):
+    p = tmp_path / "crlf.pem"
+    p.write_bytes(ed25519_key_path.read_bytes().replace(b"\n", b"\r\n") + b"\r\n\r\n")
+    assert key_type(load_private_key(p)) == "ed25519"
