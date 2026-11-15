@@ -1,0 +1,23 @@
+[Unit]
+Description=Adverse Selection Lab market-data recorder (Kalshi + Coinbase)
+Wants=network-online.target
+After=network-online.target time-sync.target
+
+[Service]
+Type=simple
+User=__USER__
+WorkingDirectory=__REPO__
+ExecStart=__REPO__/.venv/bin/python -u -m asl.recorder.run --config configs/collector.yaml
+# the recorder reconnects on its own; this restarts it if the process itself dies
+Restart=always
+RestartSec=10
+# SIGINT = same clean shutdown as Ctrl+C (flush + gzip closed hours)
+KillSignal=SIGINT
+TimeoutStopSec=60
+Nice=-5
+# light hardening; the process only needs to write inside the repo
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

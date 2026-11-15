@@ -19,6 +19,18 @@ copy .env.example .env      # then fill in KALSHI_KEY_ID and KALSHI_PRIVATE_KEY_
 pytest -q                   # should print: 29 passed
 ```
 
+## 24/7 collector on Linux (systemd)
+
+```bash
+git clone https://github.com/Vitaliy-Pikalo/adverse-selection-lab.git
+cd adverse-selection-lab
+nano .env                              # KALSHI_KEY_ID, KALSHI_PRIVATE_KEY_PATH, KALSHI_ENV=prod
+bash deploy/setup_collector.sh         # venv, tests, systemd service, no-sleep, NTP
+sudo systemctl start asl-recorder
+bash deploy/check.sh                   # health: service, file freshness, disk, clock
+bash deploy/update.sh                  # pull new code, test, restart
+```
+
 ## Commands
 
 | Task | Command |
