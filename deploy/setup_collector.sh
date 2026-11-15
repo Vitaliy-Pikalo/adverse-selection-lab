@@ -24,7 +24,11 @@ if ! command -v uv >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/uv" ]; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 UV="$(command -v uv || echo "$HOME/.local/bin/uv")"
-"$UV" venv --python 3.11 .venv
+if [ -x .venv/bin/python ]; then
+  echo "== .venv exists, reusing it"
+else
+  "$UV" venv --python 3.11 .venv
+fi
 "$UV" pip install --python .venv/bin/python -e ".[dev]"
 
 # --- 2. tests --------------------------------------------------------------

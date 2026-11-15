@@ -34,3 +34,9 @@ Append-only. Each entry: date, decision, reason, alternatives rejected.
 - **Decision:** KXBTC, KXETH (hourly range) and KXBTCD, KXETHD (hourly above/below), closing within 6 h, cap 400 markets.
 - **Reason:** Hourly expiries give many independent events per day (the unit of statistical independence). Cap avoids an undocumented per-subscription market limit (Kalshi error code 26).
 - **Open:** confirm real message volume and whether 400 trips the limit during the smoke test.
+
+## D8 — 2026-11-14 — 24/7 collector on AWS Lightsail (Ohio), not a home machine
+- **Decision:** Run the recorder on a Lightsail instance `asl-collector`, us-east-2a, Ubuntu 24.04, 1 GB RAM / 2 vCPU / 40 GB SSD, dual-stack, $7/month (Levee AWS account). 1 GB swap added. Separate read-only Kalshi API key for the VM.
+- **Reason:** A laptop or home PC sleeps, reboots and has no one to restart it; residential latency is higher and noisier, which contaminates recv-vs-exchange timing. Kalshi's API origin is reported to be AWS us-east-2.
+- **Rejected:** overnight-only laptop recording (hour-of-day sampling bias); home PC (needs in-person setup, no remote restart); 512 MB plan (OOM risk during replay).
+- **Cost to deadline:** ~$7–8. Delete the instance after Dec 14.
