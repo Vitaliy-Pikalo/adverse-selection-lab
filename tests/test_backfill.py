@@ -34,15 +34,45 @@ def test_markets_merge_live_and_historical_and_survive_endpoint_failure():
             200,
             json={
                 "markets": [
-                    {"ticker": "A", "event_ticker": "E", "result": "yes", "close_time": "x"}
+                    {
+                        "ticker": "A",
+                        "event_ticker": "E",
+                        "result": "yes",
+                        "close_time": "2026-11-01T01:00:00Z",
+                    },
+                    {
+                        "ticker": "OUT",
+                        "event_ticker": "E",
+                        "result": "no",
+                        "close_time": "2025-01-01T00:00:00Z",
+                    },
                 ]
             },
         )
 
     log = {"markets": {}, "errors": []}
-    df = fetch_markets(_rest(handler), "KXBTC", 0, 1, log)
-    assert list(df["ticker"]) == ["A"] and df["series_ticker"].iloc[0] == "KXBTC"
+    t0, t1 = 1_793_491_200, 1_793_577_600  # 2026-11-01 .. 2026-11-02 UTC
+    df = fetch_markets(_rest(handler), "KXBTC", t0, t1, log)
+    assert list(df["ticker"]) == ["A"]  # out-of-window row dropped locally
+    assert df["series_ticker"].iloc[0] == "KXBTC"
     assert len(log["errors"]) == 1  # historical 404 recorded, not fatal
+
+
+def test_historical_markets_skipped_after_cutoff_and_page_cap_is_nonfatal():
+    paths = []
+
+    def handler(req):
+        paths.append(req.url.path)
+        # server ignores filters and paginates forever
+        return httpx.Response(
+            200, json={"markets": [{"ticker": "X", "close_time": "bad"}], "cursor": "more"}
+        )
+
+    log = {"markets": {}, "errors": []}
+    df = fetch_markets(_rest(handler), "KXBTC", 100, 200, log, settled_cutoff=50, max_pages=3)
+    assert df.empty
+    assert not any(p.endswith("/historical/markets") for p in paths)
+    assert len(paths) == 3 and "exceeded" in log["errors"][0]
 
 
 def test_trades_fall_back_to_historical():

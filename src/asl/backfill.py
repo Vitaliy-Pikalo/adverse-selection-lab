@@ -49,34 +49,83 @@ MARKET_COLS = [
 ]
 
 
-def fetch_markets(rest: KalshiREST, series: str, t0: int, t1: int, log: dict) -> pd.DataFrame:
+def _ts(s: str | None) -> float | None:
+    if not s:
+        return None
+    try:
+        return datetime.fromisoformat(str(s).replace("Z", "+00:00")).timestamp()
+    except ValueError:
+        return None
+
+
+def fetch_markets(
+    rest: KalshiREST,
+    series: str,
+    t0: int,
+    t1: int,
+    log: dict,
+    settled_cutoff: float | None = None,
+    max_pages: int = 200,
+) -> pd.DataFrame:
+    """Settled markets closing in [t0, t1].
+
+    Markets settled before Kalshi's historical cutoff live only behind /historical/markets,
+    so that endpoint is queried only when the window starts before the cutoff. Results are
+    always re-filtered on close_time locally: never trust a server-side filter blindly.
+    """
     rows: dict[str, dict] = {}
     sources = [
         (
             "live",
-            lambda: rest.iter_markets(
-                series_ticker=series, status="settled", min_close_ts=t0, max_close_ts=t1
+            lambda: rest.paginate(
+                "/markets",
+                "markets",
+                {
+                    "series_ticker": series,
+                    "status": "settled",
+                    "min_close_ts": t0,
+                    "max_close_ts": t1,
+                    "limit": 1000,
+                },
+                max_pages=max_pages,
             ),
-        ),
-        (
-            "historical",
-            lambda: rest.iter_historical_markets(
-                series_ticker=series, min_close_ts=t0, max_close_ts=t1
-            ),
-        ),
+        )
     ]
+    if settled_cutoff is None or t0 < settled_cutoff:
+        sources.append(
+            (
+                "historical",
+                lambda: rest.paginate(
+                    "/historical/markets",
+                    "markets",
+                    {
+                        "series_ticker": series,
+                        "min_close_ts": t0,
+                        "max_close_ts": t1,
+                        "limit": 1000,
+                    },
+                    max_pages=max_pages,
+                ),
+            )
+        )
     for name, it in sources:
+        n = kept = 0
         try:
-            n = 0
             for m in it():
+                n += 1
+                ct = _ts(m.get("close_time"))
+                if ct is None or not t0 <= ct <= t1:
+                    continue
                 m.setdefault("series_ticker", series)
                 rows.setdefault(m["ticker"], m)
-                n += 1
-            log["markets"][f"{series}:{name}"] = n
+                kept += 1
         except httpx.HTTPStatusError as e:
             log["errors"].append(
                 f"markets {series} {name}: {e.response.status_code} {e.response.text[:200]}"
             )
+        except RuntimeError as e:  # page cap hit: server ignored our filters
+            log["errors"].append(f"markets {series} {name}: {e}")
+        log["markets"][f"{series}:{name}"] = {"returned": n, "in_window": kept}
     df = pd.DataFrame(list(rows.values()))
     if df.empty:
         return df
@@ -98,9 +147,11 @@ def _trade_row(t: dict) -> dict:
     }
 
 
-def fetch_trades(rest: KalshiREST, ticker: str, log: dict) -> list[dict]:
+def fetch_trades(
+    rest: KalshiREST, ticker: str, log: dict, try_historical: bool = True
+) -> list[dict]:
     rows = [_trade_row(t) for t in rest.iter_trades(ticker=ticker)]
-    if not rows:  # archived markets live behind the historical endpoint
+    if not rows and try_historical:  # trades before the cutoff live behind /historical
         try:
             rows = [_trade_row(t) for t in rest.iter_historical_trades(ticker=ticker)]
         except httpx.HTTPStatusError as e:
@@ -174,13 +225,17 @@ def main() -> int:
 
     creds = load_creds()
     with KalshiREST(creds.rest_url, creds.key_id, creds.private_key_path) as rest:
+        settled_cutoff = trades_cutoff = None
         try:
-            (out / "cutoff.json").write_text(json.dumps(rest.historical_cutoff(), indent=2))
+            cutoff = rest.historical_cutoff()
+            (out / "cutoff.json").write_text(json.dumps(cutoff, indent=2))
+            settled_cutoff = _ts(cutoff.get("market_settled_ts"))
+            trades_cutoff = _ts(cutoff.get("trades_created_ts"))
         except httpx.HTTPStatusError as e:
             log["errors"].append(f"cutoff: {e.response.status_code}")
 
         for series in args.series:
-            mk = fetch_markets(rest, series, t0, t1, log)
+            mk = fetch_markets(rest, series, t0, t1, log, settled_cutoff)
             print(f"{series}: {len(mk)} settled markets in window", flush=True)
             if mk.empty:
                 continue
@@ -195,8 +250,12 @@ def main() -> int:
                 if path.exists():
                     continue
                 rows = []
-                for tk in grp["ticker"]:
-                    rows.extend(fetch_trades(rest, tk, log))
+                for tk, open_t in zip(
+                    grp["ticker"], grp.get("open_time", grp["ticker"]), strict=True
+                ):
+                    ot = _ts(open_t)
+                    hist = trades_cutoff is None or ot is None or ot < trades_cutoff
+                    rows.extend(fetch_trades(rest, tk, log, try_historical=hist))
                 pd.DataFrame(
                     rows,
                     columns=list(_trade_row({"yes_price_dollars": "0", "count_fp": "0"}).keys()),
