@@ -20,10 +20,11 @@ from datetime import datetime
 from urllib.parse import urlparse
 
 import httpx
+import orjson
 from websockets.asyncio.client import connect
 from websockets.exceptions import ConnectionClosed
 
-from asl.book import BookManager
+from asl.book import SeqTracker
 from asl.config import CollectorConfig, KalshiCreds
 from asl.kalshi.auth import auth_headers, load_private_key
 from asl.kalshi.rest import KalshiREST
@@ -226,14 +227,14 @@ class KalshiRecorder:
         if self._key is not None:
             path = urlparse(self.ws_url).path
             headers = auth_headers(self._key, self.creds.key_id, "GET", path)
-        mgr = BookManager()
+        tracker = SeqTracker()
         self.channel_sid.clear()
         self._cmd_channel.clear()
         async with connect(
             self.ws_url,
             additional_headers=headers,
             ping_interval=20,
-            ping_timeout=20,
+            ping_timeout=60,  # high-throughput feed: a pong can queue behind data frames
             max_size=None,
             open_timeout=20,
         ) as ws:
@@ -248,34 +249,33 @@ class KalshiRecorder:
                 while True:
                     raw = await asyncio.wait_for(ws.recv(), timeout=self.stale_seconds)
                     recv_ns = time.time_ns()
+                    text = raw if isinstance(raw, str) else raw.decode("utf-8", "replace")
                     try:
-                        data = json.loads(raw)
-                    except json.JSONDecodeError:
-                        self.writer.write("kalshi", {"unparsed": raw}, recv_ns)
+                        data = orjson.loads(text)
+                    except orjson.JSONDecodeError:
+                        self.writer.write("kalshi", {"unparsed": text}, recv_ns)
                         continue
-                    self.writer.write("kalshi", data, recv_ns)
+                    self.writer.write_raw("kalshi", text, recv_ns)
                     self.stats["msgs"] += 1
-                    self._on_message(data, mgr)
+                    self._on_message(data, tracker)
             finally:
                 refresher.cancel()
                 with contextlib.suppress(asyncio.CancelledError):
                     await refresher
 
-    def _on_message(self, data: dict, mgr: BookManager) -> None:
-        if data.get("type") == "subscribed":
+    def _on_message(self, data: dict, tracker: SeqTracker) -> None:
+        typ = data.get("type")
+        if typ == "subscribed":
             ch = data["msg"].get("channel") or self._cmd_channel.get(data.get("id"), "")
             self.channel_sid[ch] = data["msg"]["sid"]
-        elif data.get("type") == "error":
+        elif typ == "error":
             self.writer.meta("server_error", msg=data)
-        for ev in mgr.handle(data):
-            if ev.kind == "gap":
-                self.stats["gaps"] += 1
-                self.writer.meta("gap", **ev.detail)  # type: ignore[arg-type]
-                if ev.detail and ev.detail.get("channel") != "trade":
-                    raise ResyncNeeded(str(ev.detail))
-            elif ev.kind == "invalid" and ev.detail:  # book inconsistency, not seq gap
-                self.writer.meta("book_invalid", ticker=ev.ticker, **ev.detail)
-                raise ResyncNeeded(str(ev.detail))
+        gap = tracker.observe(data)
+        if gap:
+            self.stats["gaps"] += 1
+            self.writer.meta("gap", **gap)
+            if gap["channel"] != "trade":
+                raise ResyncNeeded(str(gap))
 
     async def run_forever(self, stop: asyncio.Event) -> None:
         backoff = 1.0

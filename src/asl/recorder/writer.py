@@ -59,6 +59,26 @@ class RawWriter:
             self._fh.flush()  # type: ignore[union-attr]
             self._last_flush = now
 
+    def write_raw(self, src: str, text: str, recv_ns: int) -> None:
+        """Hot path: embed the server's JSON text verbatim (no decode/re-encode).
+
+        JSON forbids literal newlines inside strings, so any CR/LF in `text` is insignificant
+        whitespace; replacing it keeps one record per line.
+        """
+        hour = hour_key(recv_ns)
+        if hour != self._hour:
+            self._open(hour)
+        if "\n" in text or "\r" in text:
+            text = text.replace("\r", " ").replace("\n", " ")
+        self._fh.write(  # type: ignore[union-attr]
+            f'{{"recv_ns":{recv_ns},"mono_ns":{time.monotonic_ns()},"src":"{src}","raw":{text}}}\n'
+        )
+        self.lines_written += 1
+        now = time.monotonic()
+        if now - self._last_flush >= self.flush_seconds:
+            self._fh.flush()  # type: ignore[union-attr]
+            self._last_flush = now
+
     def meta(self, event: str, **detail: object) -> None:
         self.write("meta", {"event": event, **detail})
 

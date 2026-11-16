@@ -171,3 +171,26 @@ def test_ok_reply_can_itself_reveal_a_gap():
     m.handle(snap(seq=1, yes=[["0.2200", "10.00"]]))
     ev = m.handle({"type": "ok", "sid": 1, "seq": 5, "msg": {}})
     assert [e.kind for e in ev] == ["gap", "invalid"] and not m.books["T"].valid
+
+
+# --- SeqTracker (live hot path) ---
+
+
+def test_seqtracker_matches_bookmanager_rules():
+    from asl.book import SeqTracker
+
+    t = SeqTracker()
+    assert (
+        t.observe({"type": "subscribed", "msg": {"channel": "orderbook_delta", "sid": 1}}) is None
+    )
+    assert t.observe({"type": "subscribed", "msg": {"channel": "trade", "sid": 2}}) is None
+    assert t.observe(snap(seq=1)) is None
+    assert t.observe({"type": "ok", "sid": 1, "seq": 2, "msg": {}}) is None  # control reply
+    assert t.observe(delta(seq=3)) is None
+    g = t.observe(delta(seq=6))
+    assert g == {"sid": 1, "expected": 4, "got": 6, "channel": "orderbook_delta"}
+    g = t.observe({"type": "trade", "sid": 2, "seq": 1, "msg": {}})
+    assert g is None
+    g = t.observe({"type": "trade", "sid": 2, "seq": 3, "msg": {}})
+    assert g["channel"] == "trade"
+    assert t.observe({"type": "error", "msg": {"code": 1}}) is None

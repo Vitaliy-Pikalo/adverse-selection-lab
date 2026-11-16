@@ -231,3 +231,33 @@ class BookManager:
             return events + [Event("invalid", ticker=ticker, sid=sid, detail={"error": str(e)})]
         events.append(Event("book", ticker=ticker, sid=sid))
         return events
+
+
+class SeqTracker:
+    """Live-path sequence checker: no book state, no price parsing. O(1) per message.
+
+    The recorder only needs to know whether the stream is complete; books are rebuilt (and
+    validated) offline by replay. Mirrors BookManager's seq rules, including control replies
+    ("ok"/"unsubscribed") that consume a seq on their subscription.
+    """
+
+    def __init__(self) -> None:
+        self.last_seq: dict[int, int] = {}
+        self.sid_channel: dict[int, str] = {}
+
+    def observe(self, m: dict) -> dict | None:
+        typ = m.get("type")
+        if typ == "subscribed":
+            msg = m.get("msg") or {}
+            if "sid" in msg:
+                self.sid_channel[msg["sid"]] = msg.get("channel", "")
+            return None
+        sid, seq = m.get("sid"), m.get("seq")
+        if sid is None or seq is None:
+            return None
+        prev = self.last_seq.get(sid)
+        self.last_seq[sid] = seq
+        if prev is None or seq == prev + 1:
+            return None
+        channel = self.sid_channel.get(sid) or ("trade" if typ == "trade" else "orderbook_delta")
+        return {"sid": sid, "expected": prev + 1, "got": seq, "channel": channel}

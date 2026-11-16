@@ -13,6 +13,7 @@ import contextlib
 import json
 import time
 
+import orjson
 from websockets.asyncio.client import connect
 from websockets.exceptions import ConnectionClosed
 
@@ -50,13 +51,15 @@ class CoinbaseRecorder:
             while True:
                 raw = await asyncio.wait_for(ws.recv(), timeout=self.stale_seconds)
                 recv_ns = time.time_ns()
+                text = raw if isinstance(raw, str) else raw.decode("utf-8", "replace")
                 try:
-                    data = json.loads(raw)
-                except json.JSONDecodeError:
-                    data = {"unparsed": raw}
+                    data = orjson.loads(text)
+                except orjson.JSONDecodeError:
+                    self.writer.write("coinbase", {"unparsed": text}, recv_ns)
+                    continue
                 if data.get("type") == "heartbeat":
                     continue  # keeps the stale timer alive; not worth disk
-                self.writer.write("coinbase", data, recv_ns)
+                self.writer.write_raw("coinbase", text, recv_ns)
                 self.stats["msgs"] += 1
                 if data.get("type") == "error":
                     self.writer.meta("server_error", msg=data)

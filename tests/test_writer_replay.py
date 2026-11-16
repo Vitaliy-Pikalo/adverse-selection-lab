@@ -134,3 +134,14 @@ def test_end_to_end_replay_rebuilds_books_and_reports_gap(tmp_path):
     trades = pd.read_parquet(next((out / "trades").glob("*.parquet")))
     assert trades.iloc[0]["count"] == 200 and trades.iloc[0]["taker_outcome_side"] == "no"
     assert (out / "markets.parquet").exists()
+
+
+def test_write_raw_is_verbatim_and_replayable(tmp_path):
+    w = RawWriter(tmp_path, "kalshi", flush_seconds=0)
+    text = '{"type":"trade","sid":2,"seq":1,\n"msg":{"market_ticker":"T","note":"a\\nb"}}'
+    w.write_raw("kalshi", text, recv_ns=H0 + 7)
+    w.close()
+    recs = list(read_lines(tmp_path / f"kalshi_{hour_key(H0)}.jsonl"))
+    assert len(recs) == 1
+    assert recs[0]["recv_ns"] == H0 + 7 and recs[0]["src"] == "kalshi"
+    assert recs[0]["raw"]["msg"]["note"] == "a\nb"  # escaped newline inside string preserved
