@@ -49,12 +49,9 @@ if [ -z "$KEY_PATH" ] || [ ! -f "$KEY_PATH" ]; then
 fi
 chmod 600 "$KEY_PATH"
 
-# --- 4. systemd service ----------------------------------------------------
-echo "== installing systemd service asl-recorder (sudo)"
-sed -e "s|__USER__|$RUN_USER|g" -e "s|__REPO__|$REPO|g" deploy/asl-recorder.service \
-  | sudo tee /etc/systemd/system/asl-recorder.service >/dev/null
-sudo systemctl daemon-reload
-sudo systemctl enable asl-recorder.service
+# --- 4. systemd units (recorder + compression timer) ------------------------
+echo "== installing systemd units (sudo)"
+bash deploy/install_units.sh
 
 # --- 5. never sleep --------------------------------------------------------
 echo "== disabling sleep/hibernate and lid-close suspend (sudo)"

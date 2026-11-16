@@ -1,0 +1,14 @@
+[Unit]
+Description=Adverse Selection Lab: compress closed hourly raw files (zstd, crash-safe)
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=__USER__
+WorkingDirectory=__REPO__
+ExecStart=__REPO__/.venv/bin/python -u -m asl.compress --raw data/raw --level 9
+# never compete with the recorder: lowest CPU and IO priority, capped at half a core
+Nice=19
+IOSchedulingClass=idle
+CPUQuota=50%
+NoNewPrivileges=true

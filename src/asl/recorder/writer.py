@@ -3,16 +3,18 @@
 Each line: {"recv_ns": wall-clock ns, "mono_ns": monotonic ns, "src": str, "raw": <message>}
 `src` is "kalshi", "coinbase" or "meta" (recorder lifecycle: connect, subscribe, gap, ...).
 
-The current hour is written as plain .jsonl (crash-safe: at worst the last line is
-truncated). When the hour rolls over, the closed file is gzipped and the .jsonl removed.
+The writer only ever appends plain .jsonl (crash-safe: at worst the last line is truncated)
+and NEVER compresses. Compression of closed hours runs in a separate low-priority process
+(`asl.compress`, systemd timer). History: compressing inside the recorder froze the event
+loop for 5-7 min every hour (data loss + reconnects), and a SIGKILL during shutdown
+compression corrupted a .gz (2026-11-15 06:00 UTC). See DECISIONS.md D11.
+
 Raw logs are the source of truth: books, features and labels are all rebuilt from them.
 """
 
 from __future__ import annotations
 
-import gzip
 import json
-import shutil
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -33,11 +35,11 @@ class RawWriter:
         self._path: Path | None = None
         self._last_flush = 0.0
         self.lines_written = 0
-        self.gzip_closed_files()  # leftovers from a crash
 
     def _open(self, hour: str) -> None:
         self.close()
         self._hour = hour
+        # appending to an existing plain file (restart within the same hour) is safe
         self._path = self.out_dir / f"{self.src}_{hour}.jsonl"
         self._fh = self._path.open("a", encoding="utf-8")
 
@@ -61,23 +63,8 @@ class RawWriter:
         self.write("meta", {"event": event, **detail})
 
     def close(self) -> None:
+        """Flush and close. Fast by design: shutdown must never wait on compression."""
         if self._fh:
             self._fh.flush()
             self._fh.close()
             self._fh = None
-            self.gzip_closed_files()
-
-    def gzip_closed_files(self) -> None:
-        """Compress every .jsonl for this src except the hour currently open."""
-        for p in sorted(self.out_dir.glob(f"{self.src}_*.jsonl")):
-            if self._fh is not None and p == self._path:
-                continue
-            gz = p.with_suffix(".jsonl.gz")
-            if gz.exists():
-                # a previous run already wrote this hour: append as a second gzip member
-                with p.open("rb") as fi, gzip.open(gz, "ab") as fo:
-                    shutil.copyfileobj(fi, fo)
-            else:
-                with p.open("rb") as fi, gzip.open(gz, "wb") as fo:
-                    shutil.copyfileobj(fi, fo)
-            p.unlink()

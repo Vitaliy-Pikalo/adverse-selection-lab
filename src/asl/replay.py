@@ -14,36 +14,57 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import io
 import json
 import re
 import sys
+import zlib
 from collections import Counter, defaultdict
 from collections.abc import Iterator
 from pathlib import Path
 
 import pandas as pd
+import zstandard
 
 from asl.book import BookManager
 from asl.fixed import parse_price, parse_size
 
-FILE_RE = re.compile(r"^(?P<src>kalshi|coinbase)_(?P<hour>\d{8}T\d{2})\.jsonl(\.gz)?$")
+FILE_RE = re.compile(
+    r"^(?P<src>kalshi|coinbase)_(?P<hour>\d{8}T\d{2})(?:\.p(?P<part>\d+))?"
+    r"\.jsonl(?P<ext>\.gz|\.zst)?$"
+)
 
 
 def list_files(raw_dir: Path, src: str) -> list[tuple[str, Path]]:
-    """(hour, path) sorted by hour; if both .jsonl and .jsonl.gz exist, read gz then jsonl."""
+    """(hour, path) in write order: per hour, compressed parts (base, p2, p3...) then plain."""
     out = []
     for p in raw_dir.iterdir():
         m = FILE_RE.match(p.name)
         if m and m["src"] == src:
-            out.append((m["hour"], 0 if p.suffix == ".gz" else 1, p))
-    return [(h, p) for h, _, p in sorted(out)]
+            part = int(m["part"] or 1)
+            plain = m["ext"] is None
+            out.append((m["hour"], plain, part, p))
+    return [(h, p) for h, _, _, p in sorted(out)]
+
+
+def _open_text(path: Path):
+    if path.suffix == ".gz":
+        return gzip.open(path, "rt", encoding="utf-8")
+    if path.suffix == ".zst":
+        return io.TextIOWrapper(
+            zstandard.ZstdDecompressor().stream_reader(path.open("rb"), closefd=True),
+            encoding="utf-8",
+        )
+    return path.open("r", encoding="utf-8")
 
 
 def read_lines(path: Path) -> Iterator[dict]:
-    """Yield records; tolerate a truncated final line/gzip member from a crash."""
-    opener = gzip.open if path.suffix == ".gz" else open
+    """Yield records; tolerate a truncated final line or a corrupt/truncated compressed tail.
+
+    A corrupt tail is reported via the module-level CORRUPT list so quality reports show it.
+    """
     try:
-        with opener(path, "rt", encoding="utf-8") as fh:
+        with _open_text(path) as fh:
             for line in fh:
                 if not line.endswith("\n"):
                     return  # partial last write
@@ -51,8 +72,12 @@ def read_lines(path: Path) -> Iterator[dict]:
                     yield json.loads(line)
                 except json.JSONDecodeError:
                     continue
-    except (EOFError, gzip.BadGzipFile, OSError):
+    except (EOFError, gzip.BadGzipFile, OSError, zlib.error, zstandard.ZstdError) as e:
+        CORRUPT.append({"file": path.name, "error": repr(e)[:200]})
         return
+
+
+CORRUPT: list[dict] = []
 
 
 class KalshiReplayer:
@@ -228,7 +253,7 @@ def run(raw_dir: Path, out_dir: Path) -> dict:
         pd.DataFrame(list(kr.markets.values())).astype(str).to_parquet(
             out_dir / "markets.parquet", index=False
         )
-    report = {"kalshi": kr.report(), "coinbase": dict(spot_stats)}
+    report = {"kalshi": kr.report(), "coinbase": dict(spot_stats), "corrupt_files": list(CORRUPT)}
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "quality_report.json").write_text(json.dumps(report, indent=2, default=str))
     return report

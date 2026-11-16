@@ -21,6 +21,11 @@ for src in kalshi coinbase; do
   echo "   $src: $(basename "$f")  age=${age}s$flag"
 done
 
+echo "== compression timer"
+systemctl list-timers asl-compress.timer --no-pager 2>/dev/null | sed -n 2p | sed 's/^/   /'
+journalctl -u asl-compress.service -n 2 --no-pager -o cat 2>/dev/null | sed 's/^/   /'
+echo "   plain .jsonl files waiting: $(ls "$RAW"/*.jsonl 2>/dev/null | wc -l) (normal: 2, the current hour)"
+
 echo "== disk"
 du -sh "$RAW" 2>/dev/null | sed 's/^/   raw data: /'
 df -h "$REPO" | tail -1 | awk '{print "   free: "$4" of "$2" ("$5" used)"}'

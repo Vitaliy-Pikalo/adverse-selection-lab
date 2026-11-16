@@ -8,6 +8,7 @@ git pull --ff-only
 UV="$(command -v uv || echo "$HOME/.local/bin/uv")"
 "$UV" pip install --python .venv/bin/python -q -e ".[dev]"
 .venv/bin/python -m pytest -q
+bash deploy/install_units.sh
 sudo systemctl restart asl-recorder.service
 sleep 5
 systemctl is-active asl-recorder.service

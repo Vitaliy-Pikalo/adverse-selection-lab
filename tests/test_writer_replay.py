@@ -42,29 +42,37 @@ def k_delta(seq, price="0.2000", d="5.00", side="yes", ticker="KXBTC-X-B1"):
     }
 
 
-def test_hour_rotation_and_gzip(tmp_path):
+def test_hour_rotation_never_compresses(tmp_path):
     w = RawWriter(tmp_path, "kalshi", flush_seconds=0)
     w.write("kalshi", {"a": 1}, recv_ns=H0 + 1)
-    w.write("kalshi", {"a": 2}, recv_ns=H1 + 1)  # rolls over -> H0 file gzipped
-    assert (tmp_path / f"kalshi_{hour_key(H0)}.jsonl.gz").exists()
-    assert (tmp_path / f"kalshi_{hour_key(H1)}.jsonl").exists()
+    w.write("kalshi", {"a": 2}, recv_ns=H1 + 1)
     w.close()
-    assert not list(tmp_path.glob("*.jsonl"))
-    files = list_files(tmp_path, "kalshi")
-    recs = [r["raw"] for _, p in files for r in read_lines(p)]
+    names = sorted(p.name for p in tmp_path.iterdir())
+    assert names == [f"kalshi_{hour_key(H0)}.jsonl", f"kalshi_{hour_key(H1)}.jsonl"]
+    recs = [r["raw"] for _, p in list_files(tmp_path, "kalshi") for r in read_lines(p)]
     assert recs == [{"a": 1}, {"a": 2}]
 
 
-def test_crash_leftover_appended_as_second_gzip_member(tmp_path):
-    hk = hour_key(H0)
-    with gzip.open(tmp_path / f"kalshi_{hk}.jsonl.gz", "wt") as f:
-        f.write(json.dumps({"recv_ns": H0, "src": "kalshi", "raw": {"n": 1}}) + "\n")
-    (tmp_path / f"kalshi_{hk}.jsonl").write_text(
-        json.dumps({"recv_ns": H0 + 5, "src": "kalshi", "raw": {"n": 2}}) + "\n"
+def test_restart_in_same_hour_appends_plain_file(tmp_path):
+    for i in range(2):
+        w = RawWriter(tmp_path, "kalshi", flush_seconds=0)
+        w.write("kalshi", {"n": i}, recv_ns=H0 + i)
+        w.close()
+    recs = [r["raw"]["n"] for r in read_lines(tmp_path / f"kalshi_{hour_key(H0)}.jsonl")]
+    assert recs == [0, 1]
+
+
+def test_corrupt_gzip_tail_is_tolerated_and_reported(tmp_path):
+    import asl.replay as rp
+
+    good = gzip.compress(
+        (json.dumps({"recv_ns": 1, "src": "kalshi", "raw": {"n": 1}}) + "\n").encode()
     )
-    RawWriter(tmp_path, "kalshi").close()  # startup compacts leftovers
-    recs = [r["raw"]["n"] for r in read_lines(tmp_path / f"kalshi_{hk}.jsonl.gz")]
-    assert recs == [1, 2]
+    p = tmp_path / "kalshi_20251115T06.jsonl.gz"
+    p.write_bytes(good + b"\x1f\x8b\x08\x00garbage-not-deflate")
+    rp.CORRUPT.clear()
+    assert [r["raw"]["n"] for r in read_lines(p)] == [1]
+    assert rp.CORRUPT and rp.CORRUPT[0]["file"] == p.name
 
 
 def test_truncated_last_line_is_skipped(tmp_path):
