@@ -44,9 +44,15 @@
 - 05:04 `aec4426`: fix false seq gaps on update_subscription `ok` replies (confirmed in raw log: `ok` seq N then snapshot N+1 flagged as gap). After deploy: 2 min, 0 gaps, 0 reconnects, 84 live markets.
 - **15-min forward dataset starts 2026-11-15 05:04 UTC.** Earlier raw data (04:51–05:04) is hourly-series only.
 
+## Check 2026-11-16 ~09:00 UTC (≈ 28 h of 15-min data)
+- Found: in-process gzip froze the recorder 5–7 min every hour; `kalshi_20261115T06.jsonl.gz` corrupted by a SIGKILL during a needrestart-triggered shutdown; 140 reconnects. Fixed in `4bcbadc` (D11).
+- Found: **CPU throttling.** Lightsail $7 baseline is 10% sustained; recorder needs ~70–100% of a core at ~2,300–2,600 msg/s → CPU steal 31–57%, keepalive ping timeouts. Hot path optimized in `e2d5c27` (3.4× on own code), but py-spy shows the cost is mostly websockets/TLS/asyncio, not our code. Still ~75% of a core after optimization.
+- Deploy boundary for analysis: 2026-11-16 09:01–09:02 UTC (old process killed; `kalshi_20261116T08.jsonl.gz.partial-killed` set aside; complete hour kept as plain .jsonl → compressed by timer).
+- Disk: ~4.5 GB/day compressed; 27 GB free → full ~Nov 21–22.
+
 ## Open issues
-- **Disk (urgent within ~1 week):** with 15-min markets Kalshi traffic is ~138k msgs/min (vs ~15k before). Raw JSON ≈ 15–40 MB/min. gzip measured 17× on the 04:00 hour (old market mix); re-measure on the 05:00 hour. If ~3 GB/day compressed, 34 GB free lasts ~10 days, short of the Dec 7 freeze. Options: Lightsail block storage, nightly offload of closed hours, or lossless conversion of closed hours to zstd Parquet.
-- Hourly-series slots: 84 live markets total now, so the 400 cap is no longer binding.
+- **D12 (needs user decision): move recorder to a non-burstable host with a larger disk.** Recommended: EC2 c7g.medium (1 Graviton vCPU, non-burstable) in us-east-2 + ~100 GB gp3. Until then data quality is degraded under throttling.
+- Small CPU fix pending: cache the hour boundary in `RawWriter` (`hour_key` was 5% of samples).
 
 ## Uncertain
 - Real message rate, per-subscription market limit, whether `/markets` accepts `min_close_ts`/`max_close_ts` (fallback implemented).
