@@ -1,6 +1,6 @@
 # PROJECT_STATUS.md
 
-**Deadline:** 2026-12-14 · **Last updated:** 2026-11-14 · **Data freeze target:** 2026-12-07
+**Deadline:** 2026-12-14 · **Last updated:** 2026-11-17 · **Data freeze target:** 2026-12-07
 
 ## Status map
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | 1. Repo + data audit | 1–3 | ✅ done (DATA_AUDIT.md; old DB lost → Path C) |
 | M1. Data infrastructure | 1–4 | ✅ live recorder on Lightsail since 2026-11-15 04:51 UTC; replay verified on live data; 30-day backfill running |
-| M2. Backfill markouts + labels | 5–9 | ⏳ |
+| M2. Backfill markouts + labels | 5–9 | ✅ labels + first result on hourly series (A0); KXBTC15M/KXETH15M backfill running |
 | M3. Experiment A: toxicity prediction | 10–15 | ⏳ |
 | M4. Replay simulator + 3 strategies | 16–21 | ⏳ |
 | M5. Robustness | 22–25 | ⏳ |
@@ -50,6 +50,15 @@
 - Deploy boundary for analysis: 2026-11-16 09:01–09:02 UTC (old process killed; `kalshi_20261116T08.jsonl.gz.partial-killed` set aside; complete hour kept as plain .jsonl → compressed by timer).
 - Disk: ~4.5 GB/day compressed; 27 GB free → full ~Nov 21–22.
 
+## M2 — implemented (2026-11-17, `c0dd96a`)
+- `asl.pricer`: vectorized log-normal binary pricer for greater / less / between strikes (per-minute σ, τ in minutes).
+- `asl.markouts`: per-trade maker sign, model value, `stale_move_{1,5}m` (D2 feature), `maker_edge`, `move_{1,5,15}m`, `mo_{1,5,15}m`, `mo_settle`; event-block bootstrap summary. Definitions in D13. Output: `data/derived/markouts_{series}.parquet`, `markouts_summary.json`. Runs in ~30 s on 1.1M trades.
+- 16 tests: pricer limits and closed form, strike-type consistency, spot/σ no-lookahead, gaps stay NaN, maker sign, settlement pinning, `mo = edge + move`, bootstrap weighting. Full suite: 59 passed locally.
+
+## M2 — first result (EXPERIMENT_LOG A0)
+- KXBTC: makers fill +2.55¢ vs model, value then moves −1.9¢ (1 min) to −2.9¢ (15 min); net −0.73¢/contract at settlement, CI [−1.39, −0.07]. Adverse selection exceeds the spread.
+- D2 direction not supported at 1-min resolution: toxicity is U-shaped in `stale_move_1m` (large recent moves either way are worst). Needs tick-level spot (forward data) to test properly.
+
 ## Open issues
 - **D12 (needs user decision): move recorder to a non-burstable host with a larger disk.** Recommended: EC2 c7g.medium (1 Graviton vCPU, non-burstable) in us-east-2 + ~100 GB gp3. Until then data quality is degraded under throttling.
 - Small CPU fix pending: cache the hour boundary in `RawWriter` (`hour_key` was 5% of samples).
@@ -61,4 +70,5 @@
 ## Next
 1. Measure gzip ratio on the 05:00 hour; pick the disk fix before ~Nov 20.
 2. Check the 30-day backfill completed; nightly processing job on the VM.
-3. M2: trade markout labels + Experiment A on the backfill (add KXBTC15M/KXETH15M to the backfill).
+3. KXBTC15M/KXETH15M 14-day backfill started 2026-11-17 ~09:55 UTC into `data/backfill15m` (~1,300 markets × ~40k trades each; expect several hours). When done: `python -m asl.markouts --backfill data/backfill15m --series KXBTC15M KXETH15M --out data/derived15m` and add as A1.
+4. M3: Experiment A (toxicity prediction) with |stale_move|, realized vol, τ, moneyness, size; logistic regression first.

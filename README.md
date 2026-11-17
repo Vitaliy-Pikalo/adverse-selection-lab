@@ -4,7 +4,7 @@ Research question: on Kalshi BTC/ETH binary markets, is maker adverse selection 
 by quotes going stale relative to the underlying spot price, and does a quoting policy that
 reacts to that risk beat static and inventory-aware quoting under conservative fill assumptions?
 
-Status: **Milestone 1 — data infrastructure.** No results yet. See `PROJECT_STATUS.md`.
+Status: **Milestone 2 — markout labels done.** First result (EXPERIMENT_LOG A0): on 1M KXBTC trades, makers fill 2.55¢ better than a log-normal model, then the value moves 1.9–2.9¢ against them; net −0.73¢ per contract at settlement (95% CI −1.39 to −0.07). See `PROJECT_STATUS.md`.
 
 This project is research and paper simulation only. The code has no order-placement path.
 
@@ -16,7 +16,7 @@ py -3.11 -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 copy .env.example .env      # then fill in KALSHI_KEY_ID and KALSHI_PRIVATE_KEY_PATH
-pytest -q                   # should print: 29 passed
+pytest -q                   # should print: 59 passed
 ```
 
 ## 24/7 collector on Linux (systemd)
@@ -40,6 +40,7 @@ bash deploy/update.sh                  # pull new code, test, restart
 | Rebuild books + quality report | `python -m asl.replay` |
 | Quick backfill check | `python -m asl.backfill --series KXBTC --days 2 --max-markets 50` |
 | Full backfill (30 days) | `python -m asl.backfill --series KXBTC KXETH --days 30` |
+| Markout labels + summary (M2) | `python -m asl.markouts --series KXBTC KXETH` |
 
 ## Layout
 
@@ -52,6 +53,8 @@ src/asl/
   recorder/           WebSocket recorders (Kalshi orderbook_delta + trade, Coinbase ticker)
   replay.py           raw logs -> top-of-book / trades / spot parquet + quality report
   backfill.py         settled markets, public trades, Coinbase 1-min candles
+  pricer.py           log-normal binary pricer (greater / less / between strikes)
+  markouts.py         M2: maker markout labels, stale-move feature, event-block bootstrap
 configs/collector.yaml
 data/                 raw + derived data (gitignored, reproducible)
 ```
