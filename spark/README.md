@@ -1,8 +1,9 @@
-# Local Spark port: Phase 1 environment
+# Local Spark port: environment and ingestion
 
 This additive port uses Ubuntu under WSL2. The pandas pipeline in `src/asl/`,
-research outputs, collector, and deployment files remain unchanged. Labeling,
-parity, benchmarks, and a CI job are later phases; no speedup is claimed.
+research outputs, collector, and deployment files remain unchanged. Environment
+setup and ingestion/joins are implemented. Labels, full label parity, benchmarks,
+and a CI job are later phases; no speedup is claimed.
 
 ## Verified environment (November 19, 2026)
 
@@ -117,3 +118,82 @@ export UV_CACHE_DIR=/opt/asl-spark/cache
 References: [Spark 4.0.1 installation requirements](https://spark.apache.org/docs/4.0.1/api/python/getting_started/install.html),
 [Microsoft WSL installation](https://learn.microsoft.com/en-us/windows/wsl/install),
 and [uv installation](https://docs.astral.sh/uv/getting-started/installation/).
+
+## Phase 2: ingestion and minute joins
+
+`ingestion.py` reads the existing trade, market, and candle Parquet files with
+explicit schemas. It coerces invalid strike strings to null, maps settlement
+results, and applies the pandas eligibility rules: exclude block trades, unmatched
+markets, unknown settlements, and trades at or after close. The market join uses
+null-safe key equality, matching pandas' null-key merge behavior.
+
+`spot.py` builds a complete UTC minute grid with null candle gaps, then left-joins
+minute opens at t, t-1m, t-5m, t+1m, t+5m, and t+15m. It never forward-fills gaps.
+Future spot columns are named separately from historical inputs. Volatility,
+pricing, fixed-point scaling, and labels are reserved for Phase 3.
+
+A **broadcast join** copies the small spot table to each worker so the large trade
+table can be joined without redistributing its rows for each spot lookup. Market
+join strategy is left to Spark's optimizer.
+
+### Duplicate and ordering contract
+
+Identical trade/candle records with the same key collapse safely. Conflicting
+records with the same trade ID or candle timestamp raise `ValueError`: pandas
+keeps the first input record, and Spark does not guarantee that file/row order.
+This is an explicit restriction of the port. Both hourly datasets passed these
+guards. Any duplicate market ticker is rejected, including identical rows,
+matching pandas' many-to-one join validation.
+
+The loaders run Spark actions for these guards. Future end-to-end benchmarks must
+include that validation cost. Output order is unspecified; comparison uses unique
+trade IDs and checks row multiplicity.
+
+### Commands and observed results (November 19, 2026)
+
+From the Windows repository directory:
+
+```powershell
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m pytest tests/test_spark_ingestion.py -q -p no:cacheprovider
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m spark.verify_ingestion --backfill data/backfill --series KXBTC KXETH
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/ruff check spark src tests
+.venv\Scripts\python.exe -B -m pytest -q -p no:cacheprovider
+```
+
+Observed test/lint output:
+
+```text
+5 passed, 14 warnings in 63.09s
+All checks passed!
+59 passed, 1 skipped in 45.60s
+```
+
+The Windows suite skips the Spark test module when PySpark is absent, preserving
+compatibility with the current CI environment. The new tests cover minute-open
+selection at microsecond boundaries, missing minutes, all eligibility filters,
+identical and conflicting duplicates, market-key validation, and empty trade input.
+The Spark-to-pandas conversion in the small fixture emits pandas copy-keyword
+deprecation warnings; all comparisons pass.
+
+The full check compares all 20 intermediate columns by trade ID against the
+existing pandas loaders and spot lookup functions. It checks missing-value masks,
+unknown/duplicate/omitted keys, and numeric values with `rtol=1e-12, atol=1e-12`.
+Spark output is written to an automatically removed Linux temporary directory
+and compared in batches of 10,000 rows; research outputs are not overwritten.
+
+| Series | Compared rows | Compared columns | Result |
+|---|---:|---:|---|
+| KXBTC | 1,010,733 | 20 | PASS |
+| KXETH | 110,811 | 20 | PASS |
+| Total | 1,121,544 | 20 | PASS |
+
+Missing spot rows matched pandas at every offset:
+
+| Series | t | t-1m | t-5m | t+1m | t+5m | t+15m |
+|---|---:|---:|---:|---:|---:|---:|
+| KXBTC | 2,991 | 2,984 | 3,143 | 2,990 | 2,642 | 2,267 |
+| KXETH | 185 | 181 | 181 | 179 | 185 | 188 |
+
+These are ingestion/join correctness results. Full label parity and labeling
+benchmark numbers are not yet available. The separate `data/backfill15m` dataset
+is outside this phase's validation scope.
