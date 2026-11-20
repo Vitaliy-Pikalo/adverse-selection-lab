@@ -1,9 +1,9 @@
-# Local Spark port: environment and ingestion
+# Local Spark port: environment, ingestion, and labels
 
 This additive port uses Ubuntu under WSL2. The pandas pipeline in `src/asl/`,
 research outputs, collector, and deployment files remain unchanged. Environment
-setup and ingestion/joins are implemented. Labels, full label parity, benchmarks,
-and a CI job are later phases; no speedup is claimed.
+setup, ingestion/joins, and labels are implemented. The formal pytest parity gate,
+benchmarks, and a CI job are later phases; no speedup is claimed.
 
 ## Verified environment (November 19, 2026)
 
@@ -129,8 +129,8 @@ null-safe key equality, matching pandas' null-key merge behavior.
 
 `spot.py` builds a complete UTC minute grid with null candle gaps, then left-joins
 minute opens at t, t-1m, t-5m, t+1m, t+5m, and t+15m. It never forward-fills gaps.
-Future spot columns are named separately from historical inputs. Volatility,
-pricing, fixed-point scaling, and labels are reserved for Phase 3.
+Future spot columns are named separately from historical inputs. The initial
+Phase 2 comparison covered ingestion/joins; Phase 3 extends them with labels below.
 
 A **broadcast join** copies the small spot table to each worker so the large trade
 table can be joined without redistributing its rows for each spot lookup. Market
@@ -194,6 +194,119 @@ Missing spot rows matched pandas at every offset:
 | KXBTC | 2,991 | 2,984 | 3,143 | 2,990 | 2,642 | 2,267 |
 | KXETH | 185 | 181 | 181 | 179 | 185 | 188 |
 
-These are ingestion/join correctness results. Full label parity and labeling
-benchmark numbers are not yet available. The separate `data/backfill15m` dataset
-is outside this phase's validation scope.
+These are ingestion/join correctness results. The separate `data/backfill15m`
+dataset is outside this phase's validation scope.
+
+## Phase 3: volatility and labels
+
+`spot.prepare_spot` computes minute log-close differences and sample standard
+deviation using native Spark window functions. A **window function** computes
+over neighboring ordered rows while retaining each row. On the complete minute
+grid, the frame `rowsBetween(-60, -1)` reproduces pandas' 60-minute rolling
+standard deviation shifted by one minute. At least 30 valid returns are required.
+A missing close invalidates its return and the following return; gaps stay missing.
+
+Each call handles one product. Its ordered window uses one partition over the
+small spot table (roughly 43,200 rows here), then the prepared spot table is
+broadcast into the trade joins. The million-row trade table is not placed in a
+single ordered window. Future spot joins project only the open; only the t join
+exposes sigma.
+
+`pricer.py` implements the existing log-normal probability formula with Spark
+expressions for logarithms, square roots, validity checks, and clipping. Spark
+4.0.1 has no native Python API `erf` function. An Arrow-backed **pandas UDF** moves
+column batches between the JVM and Python for the normal CDF; `math.erf` is
+evaluated per element with the same formula as the reference pricer. This is a
+Python computation cost that must be included in benchmarks. It does not run the
+pandas labeling pipeline inside Spark.
+
+`labels.build_labels` produces the same 27 columns as the default pandas labels,
+with unordered rows keyed by trade ID:
+
+- Fixed-point price/quantity scaling, maker sign, and microsecond time-to-close.
+- Current fair value, maker edge, and 1/5-minute stale-move features.
+- Settlement markout and 1/5/15-minute markouts and value moves.
+- Trade-time sigma retained for every pricing call, including future labels.
+- Settlement pinning at or after close, even without future spot or valid sigma.
+
+Missing values are preserved before Spark's null-skipping `greatest`/`least`
+operations. This avoids inventing a volatility floor or a clipped probability
+when the reference value is missing.
+
+`load_labels(session, backfill, series)` combines the local readers and label
+expressions. It does not write data. The research bootstrap and summary functions
+remain unchanged and are not invoked by the port.
+
+### Phase 3 verification
+
+The synthetic cases cover volatility warmup/gaps, all strike types, sigma floors,
+invalid/nonfinite inputs, microsecond timestamps, fixed-point scaling, mixed
+contract labels, future-candle mutation, and settlement exactly at close without
+future spot or sigma. Label decomposition is checked where trade-time fair value
+exists: a future markout can be defined when the current fair value is missing,
+in which case maker edge and value move are missing in both implementations.
+
+The diagnostic below computes a fresh pandas reference with existing functions,
+writes Spark labels only to an automatically removed Linux temporary directory,
+and compares batches of 10,000 rows. It checks exact keys, row multiplicity,
+timestamps, maker signs, settlements, price, quantity, spot, and missing-value
+masks. The remaining numeric columns use tolerances declared before the full run:
+`rtol=1e-10, atol=1e-12`. Maximum absolute errors are reported, not hidden.
+
+```powershell
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m pytest tests/test_spark_ingestion.py tests/test_spark_labels.py -q -p no:cacheprovider
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m spark.verify_labels --backfill data/backfill --series KXBTC KXETH
+.venv\Scripts\python.exe -B -m pytest tests/test_markouts.py tests/test_spark_ingestion.py tests/test_spark_labels.py -q -p no:cacheprovider
+```
+
+Observed test output:
+
+```text
+11 passed, 113 warnings in 161.79s
+16 passed, 2 skipped in 6.93s
+```
+
+The warnings include Spark's pandas copy-keyword deprecations and an expected
+NumPy invalid-divide warning from deliberately testing infinite volatility in
+the unchanged reference pricer. Test durations are not labeling benchmarks.
+
+Full-data diagnostic output on November 19, 2026:
+
+```text
+KXBTC: PASS — 1,010,733 rows, 27 columns
+KXETH: PASS —   110,811 rows, 27 columns
+Total:       1,121,544 rows
+```
+
+All keys, missing-value masks, and exact comparison columns matched. Maximum
+absolute differences from the diagnostic (rounded here; the command reports full
+precision):
+
+| Column | KXBTC | KXETH |
+|---|---:|---:|
+| tau_min (minutes) | 1.8189894e-12 | 1.8189894e-12 |
+| floor_strike / cap_strike | 0 | 0 |
+| sigma | 2.3342873e-16 | 1.0863706e-16 |
+| fv | 4.1167070e-13 | 1.3389290e-13 |
+| maker_edge | 4.1167070e-13 | 1.3389290e-13 |
+| stale_move_1m | 2.2210012e-13 | 1.0691448e-13 |
+| stale_move_5m | 2.9937164e-13 | 1.2623236e-13 |
+| mo_settle | 0 | 0 |
+| mo_1m | 4.3121062e-13 | 1.2789769e-13 |
+| mo_5m | 4.0689674e-13 | 1.3022916e-13 |
+| mo_15m | 5.6976646e-13 | 1.1346479e-13 |
+| move_1m | 2.2043478e-13 | 8.5931262e-14 |
+| move_5m | 3.1097347e-13 | 1.0635937e-13 |
+| move_15m | 5.6887828e-13 | 1.3389290e-13 |
+
+The floating comparison uses both relative and absolute tolerance; it is not an
+absolute-error-only threshold. All horizon markout differences were below the
+1e-12 absolute tolerance. The diagnostic holds a pandas reference while Spark
+runs, so its runtime and memory profile do not measure the engines separately.
+
+This diagnostic supports Phase 3 development. Phase 4 still needs the dedicated
+pytest parity gate, including its full-dataset execution. No labeling benchmark
+has been performed.
+
+References: [Spark window frames](https://spark.apache.org/docs/4.0.1/api/python/reference/pyspark.sql/api/pyspark.sql.Window.rowsBetween.html),
+[Spark pandas UDFs](https://spark.apache.org/docs/4.0.1/api/python/reference/pyspark.sql/api/pyspark.sql.functions.pandas_udf.html).
