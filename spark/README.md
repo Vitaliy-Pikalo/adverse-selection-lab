@@ -2,8 +2,8 @@
 
 This additive port uses Ubuntu under WSL2. The pandas pipeline in `src/asl/`,
 research outputs, collector, and deployment files remain unchanged. Environment
-setup, ingestion/joins, and labels are implemented. The formal pytest parity gate,
-benchmarks, and a CI job are later phases; no speedup is claimed.
+setup, ingestion/joins, labels, and pytest parity gates are implemented.
+Benchmarks and a CI job are later phases; no speedup is claimed.
 
 ## Verified environment (November 19, 2026)
 
@@ -304,9 +304,103 @@ absolute-error-only threshold. All horizon markout differences were below the
 1e-12 absolute tolerance. The diagnostic holds a pandas reference while Spark
 runs, so its runtime and memory profile do not measure the engines separately.
 
-This diagnostic supports Phase 3 development. Phase 4 still needs the dedicated
-pytest parity gate, including its full-dataset execution. No labeling benchmark
-has been performed.
+This diagnostic supported Phase 3 development. The dedicated Phase 4 pytest gate
+is described below. No labeling benchmark has been performed.
 
 References: [Spark window frames](https://spark.apache.org/docs/4.0.1/api/python/reference/pyspark.sql/api/pyspark.sql.Window.rowsBetween.html),
 [Spark pandas UDFs](https://spark.apache.org/docs/4.0.1/api/python/reference/pyspark.sql/api/pyspark.sql.functions.pandas_udf.html).
+
+## Phase 4: pytest parity gate
+
+`tests/test_spark_parity.py` tests the complete Parquet-to-label pipeline. The
+shared comparator in `spark/parity.py` is also used by the interactive diagnostic;
+its tolerances are unchanged from Phase 3. It requires all 27 columns, checks
+every row by trade ID, checks exact columns and missing-value masks, and bounds
+the remaining floating differences. It streams Spark output in 10,000-row
+batches. Physical row order and pandas/Spark dtype representations may differ;
+timestamps are compared as UTC instants without rounding.
+
+The routine end-to-end fixture generates deterministic **synthetic** Parquet
+inputs in a pytest temporary directory. Its 49 eligible trades cover all three
+strike types, both maker signs, volatility warmup, candle gaps, microsecond
+timestamps, settlement horizons, identical duplicates, and eligibility filters.
+It is not a sampled claim about the research dataset. It requires no credentials,
+network access, or local research data and is suitable for the Phase 6 CI job.
+
+Thirteen comparator checks run even without PySpark. They verify rejection of
+missing rows, duplicate keys within/across batches, unknown/null keys, missing
+columns (including empty output), changed float values, changed missing-value
+masks, changed exact prices, changed timestamps, and errors near zero. Reordered
+rows and a float difference inside the declared tolerance are accepted.
+
+Routine command from the Windows repository directory:
+
+```powershell
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m pytest tests/test_spark_parity.py -q -s -p no:cacheprovider
+```
+
+The full-data tests are opt-in. `--spark-full-data` requires PySpark; it errors
+if PySpark is absent. Missing inputs, incorrect event-file counts, or incorrect
+reference row counts fail the tests. An explicit full run cannot quietly fall
+back to the synthetic fixture or pass with a partial hourly backfill.
+
+The audited hourly scope is pinned to 704 KXBTC trade files / 1,010,733 label
+rows and 693 KXETH trade files / 110,811 label rows. Deliberately replacing that
+dataset requires reviewing the `FULL_FILES` and `FULL_ROWS` constants in the test.
+These are file/row-count checks, not cryptographic dataset hashes.
+
+```powershell
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m pytest tests/test_spark_parity.py -m spark_full --spark-full-data --spark-backfill data/backfill -q -s -p no:cacheprovider
+```
+
+`--spark-backfill` accepts a local path; relative paths resolve from the repository
+root. Without `--spark-full-data`, the two full cases are explicitly skipped.
+Without PySpark, the synthetic integration case is also skipped while the
+comparator checks still run. The original pandas pipeline, stored research
+outputs, collector, and deployment remain unchanged.
+
+Both full cases compute fresh pandas labels with the original functions and
+Spark labels with `load_labels`. Spark output is written to automatically removed
+Linux temporary directories, including when comparison fails. No bootstrap,
+research-summary generation, backfill download, or collector command runs.
+Pytest elapsed times and this co-resident comparison are not labeling benchmarks.
+
+Observed routine results on November 19, 2026:
+
+```text
+WSL parity module: 14 passed, 2 skipped in 122.33s
+Synthetic sample: PASS — 49 rows, 27 columns
+Windows complete suite: 72 passed, 5 skipped in 12.38s
+ruff check spark src tests: All checks passed!
+```
+
+The routine WSL run skipped only the two opt-in full cases. The Windows run
+also skipped Spark integration because PySpark is intentionally isolated in WSL.
+A negative check with `--spark-full-data` in the Windows environment exited
+nonzero with `--spark-full-data requires PySpark`, confirming that an explicitly
+requested full gate cannot be reported as a skip when Spark is unavailable.
+
+Observed explicit full-data pytest result on November 19, 2026:
+
+```text
+2 passed, 14 deselected in 454.03s
+```
+
+| Full pytest case | Compared rows | Columns | Result |
+|---|---:|---:|---|
+| test_full_dataset_parity[KXBTC] | 1,010,733 | 27 | PASS |
+| test_full_dataset_parity[KXETH] | 110,811 | 27 | PASS |
+| Total | 1,121,544 | 27 | PASS |
+
+The 14 deselected cases were the routine comparator/sample tests, which passed
+in the separate routine run above. Both full cases ran; neither was skipped.
+All keys, row counts, exact-value columns, and missing-value masks matched.
+Settlement markouts had zero difference for both series. The largest absolute
+horizon-markout differences were 5.6976646e-13 dollars/contract for KXBTC and
+1.3022916e-13 for KXETH. The full per-column error reports matched the Phase 3
+table above. The label engine was unchanged during Phase 4.
+
+This completes the full-dataset parity gate. Phase 5 must measure pandas and
+Spark separately for three runs each and report medians with machine/resource
+settings. The 454.03-second pytest duration includes reference computation,
+Spark execution, validation, and comparison; it is not an engine benchmark.
