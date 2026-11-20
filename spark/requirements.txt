@@ -1,0 +1,6 @@
+# Run from the repository root. Keep the research numerical stack unchanged.
+-e .[dev]
+pyspark==4.0.1
+pandas==3.1.1
+numpy==2.4.6
+pyarrow==26.0.1
