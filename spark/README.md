@@ -3,7 +3,8 @@
 This additive port uses Ubuntu under WSL2. The pandas pipeline in `src/asl/`,
 research outputs, collector, and deployment files remain unchanged. Environment
 setup, ingestion/joins, labels, and pytest parity gates are implemented.
-Benchmarks and a CI job are later phases; no speedup is claimed.
+The measured local benchmark is below. A dedicated CI job is added in Phase 6;
+no Spark speedup is claimed on this dataset.
 
 ## Verified environment (November 19, 2026)
 
@@ -404,3 +405,91 @@ This completes the full-dataset parity gate. Phase 5 must measure pandas and
 Spark separately for three runs each and report medians with machine/resource
 settings. The 454.03-second pytest duration includes reference computation,
 Spark execution, validation, and comparison; it is not an engine benchmark.
+
+## Phase 5: measured local benchmark
+
+The six-run benchmark completed on November 19, 2026 (Eastern time), recorded
+as November 20 in UTC. All runs labeled the same 1,121,544 hourly trades across
+KXBTC/KXETH, wrote all 27 columns, and passed output row-count/schema checks.
+
+| Engine | Run 1 (s) | Run 2 (s) | Run 3 (s) | Median (s) |
+|---|---:|---:|---:|---:|
+| pandas | 55.983380 | 36.537986 | 35.832539 | **36.537986** |
+| Spark local[*] | 175.041353 | 192.466803 | 160.712250 | **175.041353** |
+
+**Spark took 4.79 times as long as pandas by the median** for this fresh-process
+batch workload. All three measurements per engine are retained; none were
+discarded or replaced. This result is specific to this implementation, machine,
+dataset, storage placement, and protocol. It does not measure a distributed
+cluster or a long-lived, warmed Spark session.
+
+Reproduce from the Windows repository directory:
+
+```powershell
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m spark.benchmark run --backfill data/backfill
+```
+
+Observed final output:
+
+```text
+BENCHMARK_RESULT {"status": "PASS", "median_seconds": {"pandas": 36.53798611800005, "spark": 175.04135288199996}, "spark_over_pandas_ratio": 4.790667781105968, "inputs_unchanged": true}
+```
+
+### Machine and settings
+
+- Samsung 730QCJ/730QCR; Intel i7-10510U, 4 physical cores / 8 logical CPUs.
+- Host RAM: 12,655,898,624 bytes (about 11.8 GiB), checked with Windows CIM.
+- Ubuntu 26.04.1 on WSL2, kernel 6.6.87.2; 8 CPUs available to the process.
+- WSL RAM: 6,098,735,104 bytes (about 5.68 GiB); 2 GiB configured swap.
+- Python 3.11.9, pandas 3.1.1, NumPy 2.4.6, PyArrow 26.0.1 for both engines.
+- PySpark 4.0.1 / OpenJDK 17.0.21.1, master `local[*]`, default parallelism 8.
+- JVM maximum heap: 1 GiB; 200 initial shuffle partitions; adaptive execution on;
+  broadcast threshold 10 MiB; Arrow batch limit 10,000; UTC session timezone.
+- Spark console progress rendering disabled for the benchmark; label/session
+  implementation otherwise unchanged. No DataFrame caching or JVM reuse.
+- Inputs on Windows-mounted `/mnt/c` (9p); temporary outputs on Linux ext4
+  `/var/tmp`. `/tmp` was avoided because this WSL installation mounts it as tmpfs.
+
+### Timing boundary and limitations
+
+The fixed run order was **pandas, Spark, Spark, pandas, pandas, Spark**, with each
+engine launched in a separate Python process. The parent measured process launch
+through worker exit with `time.perf_counter`. Imports, JVM/Python-worker startup,
+input reads, each implementation's validation, minute-grid/volatility preparation,
+joins, pricing/labels, Snappy Parquet writes, and Spark stop/Python exit counted.
+WSL boot, parent environment discovery, hashing, parent output checks, output
+removal, parity comparison, and the research bootstrap/summary did not count.
+
+Both engines used Snappy and the same output filesystem. Their native file
+layouts were retained: pandas wrote one file per series; Spark wrote nine BTC
+parts and eight ETH parts. Writes forced every label column to materialize;
+DataFrame construction or row counts alone were not used as the timed workload.
+
+All 1,401 input files (59,818,237 bytes) were hashed before timing, which pre-read
+their contents and warmed filesystem caches. Caches were not flushed; no warmup
+run was discarded. These are fresh-process, filesystem-cache-influenced runs,
+not cold-disk measurements. This was a shared laptop, with normal background
+activity and no fixed CPU-frequency or thermal controls. Per-run load/memory/swap
+snapshots are recorded, but they are not peak-memory measurements. Three trials
+provide a descriptive median, not a confidence interval or a universal ratio.
+
+At this scale the data fits in memory. The current Spark path pays for JVM and
+worker startup, scheduling/shuffles, many small input files, extra duplicate-key
+validation scans, and Arrow/Python CDF transfers. Those costs are plausible
+contributors to the slower batch result; they were not individually profiled.
+This benchmark includes them rather than claiming a speedup from parallelism.
+
+### Raw evidence
+
+- [Results, exact worker commands, machine/settings, six timings, and output metadata](benchmarks/20261120T030922Z/results.json)
+- [Per-file input hashes and sizes](benchmarks/20261120T030922Z/inputs.json)
+- [pandas run 1 log](benchmarks/20261120T030922Z/pandas_1.log),
+  [run 2](benchmarks/20261120T030922Z/pandas_2.log), [run 3](benchmarks/20261120T030922Z/pandas_3.log)
+- [Spark run 1 log](benchmarks/20261120T030922Z/spark_1.log),
+  [run 2](benchmarks/20261120T030922Z/spark_2.log), [run 3](benchmarks/20261120T030922Z/spark_3.log)
+
+The post-run input digest matched the pre-run digest, and the measured engine and
+harness source hashes were unchanged. The measured engine baseline was commit
+`dab5a0f`, which had already passed the full parity gate. Only generated benchmark
+receipts/logs are retained; temporary labeled data was removed. No original
+research outputs, results, collector files, or deployments were modified.

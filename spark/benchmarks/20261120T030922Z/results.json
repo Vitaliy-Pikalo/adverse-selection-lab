@@ -1,0 +1,854 @@
+{
+  "status": "PASS",
+  "started_utc": "2026-11-20T03:09:22.596477+00:00",
+  "command": "/opt/asl-spark/venv/bin/python -B -m spark.benchmark run --backfill data/backfill",
+  "backfill": "/mnt/c/Users/pikal/adverse-selection-lab/data/backfill",
+  "machine": {
+    "cpu": {
+      "Architecture": "x86_64",
+      "CPU(s)": "8",
+      "Model name": "Intel(R) Core(TM) i7-10510U CPU @ 1.80GHz",
+      "Thread(s) per core": "2",
+      "Core(s) per socket": "4",
+      "Socket(s)": "1",
+      "Hypervisor vendor": "Microsoft"
+    },
+    "affinity_cpu_count": 8,
+    "kernel": "6.6.87.2-microsoft-standard-WSL2",
+    "architecture": "x86_64",
+    "os": "Ubuntu 26.04.1 LTS",
+    "python": "3.11.9",
+    "python_executable": "/opt/asl-spark/venv/bin/python",
+    "packages": {
+      "pandas": "3.1.1",
+      "numpy": "2.4.6",
+      "pyarrow": "26.0.1",
+      "pyspark": "4.0.1"
+    },
+    "java": "openjdk version \"17.0.21.1\" 2026-11-17\nOpenJDK Runtime Environment (build 17.0.21.1+2-1-26.04.1-Ubuntu)\nOpenJDK 64-Bit Server VM (build 17.0.21.1+2-1-26.04.1-Ubuntu, mixed mode, sharing)",
+    "filesystems": "Filesystem     Type  1K-blocks      Used Available Use% Mounted on\n/dev/sdf       ext4 1055762868   4482084 997577312   1% /\nC:\\            9p    483631100 317427708 166203392  66% /mnt/c",
+    "memory": {
+      "MemTotal_bytes": 6098735104,
+      "MemAvailable_bytes": 4523196416,
+      "SwapTotal_bytes": 2147483648,
+      "SwapFree_bytes": 2145636352,
+      "load_average": [
+        6.0732421875,
+        4.0048828125,
+        1.93212890625
+      ]
+    },
+    "git_head": "dab5a0fa86072ff1ab7762d61fb6dba5f9d033ea"
+  },
+  "runs": [
+    {
+      "engine": "pandas",
+      "number": 1,
+      "wall_seconds": 55.98337981999998,
+      "command": [
+        "/opt/asl-spark/venv/bin/python",
+        "-B",
+        "-m",
+        "spark.benchmark",
+        "worker",
+        "--engine",
+        "pandas",
+        "--backfill",
+        "/mnt/c/Users/pikal/adverse-selection-lab/data/backfill",
+        "--output",
+        "/var/tmp/asl-benchmark-_2y37tjy/labels",
+        "--receipt",
+        "/var/tmp/asl-benchmark-_2y37tjy/worker.json"
+      ],
+      "log": "pandas_1.log",
+      "worker": {
+        "engine": "pandas",
+        "status": "PASS",
+        "compression": "snappy",
+        "settings": {
+          "parquet_engine": "pyarrow",
+          "index": false
+        }
+      },
+      "outputs": {
+        "KXBTC": {
+          "rows": 1010733,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 1,
+          "bytes": 118413735
+        },
+        "KXETH": {
+          "rows": 110811,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 1,
+          "bytes": 15446302
+        }
+      },
+      "memory_before": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 4552310784,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2145099776,
+        "load_average": [
+          4.40576171875,
+          3.95751953125,
+          2.04931640625
+        ]
+      },
+      "memory_after": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 5309210624,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2142990336,
+        "load_average": [
+          3.58154296875,
+          3.74658203125,
+          2.0830078125
+        ]
+      }
+    },
+    {
+      "engine": "spark",
+      "number": 1,
+      "wall_seconds": 175.04135288199996,
+      "command": [
+        "/opt/asl-spark/venv/bin/python",
+        "-B",
+        "-m",
+        "spark.benchmark",
+        "worker",
+        "--engine",
+        "spark",
+        "--backfill",
+        "/mnt/c/Users/pikal/adverse-selection-lab/data/backfill",
+        "--output",
+        "/var/tmp/asl-benchmark-vz9gijd6/labels",
+        "--receipt",
+        "/var/tmp/asl-benchmark-vz9gijd6/worker.json"
+      ],
+      "log": "spark_1.log",
+      "worker": {
+        "engine": "spark",
+        "status": "PASS",
+        "compression": "snappy",
+        "settings": {
+          "master": "local[*]",
+          "default_parallelism": 8,
+          "spark.ui.showConsoleProgress": "false",
+          "jvm_max_heap_bytes": 1073741824,
+          "spark.sql.session.timeZone": "UTC",
+          "spark.sql.shuffle.partitions": "200",
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.autoBroadcastJoinThreshold": "10485760b",
+          "spark.sql.execution.arrow.maxRecordsPerBatch": "10000"
+        }
+      },
+      "outputs": {
+        "KXBTC": {
+          "rows": 1010733,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 9,
+          "bytes": 143445379
+        },
+        "KXETH": {
+          "rows": 110811,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 8,
+          "bytes": 16655194
+        }
+      },
+      "memory_before": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 5296353280,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2142990336,
+        "load_average": [
+          3.58154296875,
+          3.74658203125,
+          2.0830078125
+        ]
+      },
+      "memory_after": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 3549728768,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125066240,
+        "load_average": [
+          9.15625,
+          6.6005859375,
+          3.4833984375
+        ]
+      }
+    },
+    {
+      "engine": "spark",
+      "number": 2,
+      "wall_seconds": 192.4668031189999,
+      "command": [
+        "/opt/asl-spark/venv/bin/python",
+        "-B",
+        "-m",
+        "spark.benchmark",
+        "worker",
+        "--engine",
+        "spark",
+        "--backfill",
+        "/mnt/c/Users/pikal/adverse-selection-lab/data/backfill",
+        "--output",
+        "/var/tmp/asl-benchmark-xo6k070m/labels",
+        "--receipt",
+        "/var/tmp/asl-benchmark-xo6k070m/worker.json"
+      ],
+      "log": "spark_2.log",
+      "worker": {
+        "engine": "spark",
+        "status": "PASS",
+        "compression": "snappy",
+        "settings": {
+          "master": "local[*]",
+          "default_parallelism": 8,
+          "spark.ui.showConsoleProgress": "false",
+          "jvm_max_heap_bytes": 1073741824,
+          "spark.sql.session.timeZone": "UTC",
+          "spark.sql.shuffle.partitions": "200",
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.autoBroadcastJoinThreshold": "10485760b",
+          "spark.sql.execution.arrow.maxRecordsPerBatch": "10000"
+        }
+      },
+      "outputs": {
+        "KXBTC": {
+          "rows": 1010733,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 9,
+          "bytes": 143445379
+        },
+        "KXETH": {
+          "rows": 110811,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 8,
+          "bytes": 16655194
+        }
+      },
+      "memory_before": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 3548921856,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125066240,
+        "load_average": [
+          9.15625,
+          6.6005859375,
+          3.4833984375
+        ]
+      },
+      "memory_after": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 3715801088,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125328384,
+        "load_average": [
+          11.76513671875,
+          8.31005859375,
+          4.66943359375
+        ]
+      }
+    },
+    {
+      "engine": "pandas",
+      "number": 2,
+      "wall_seconds": 36.53798611800005,
+      "command": [
+        "/opt/asl-spark/venv/bin/python",
+        "-B",
+        "-m",
+        "spark.benchmark",
+        "worker",
+        "--engine",
+        "pandas",
+        "--backfill",
+        "/mnt/c/Users/pikal/adverse-selection-lab/data/backfill",
+        "--output",
+        "/var/tmp/asl-benchmark-3kklwyaz/labels",
+        "--receipt",
+        "/var/tmp/asl-benchmark-3kklwyaz/worker.json"
+      ],
+      "log": "pandas_2.log",
+      "worker": {
+        "engine": "pandas",
+        "status": "PASS",
+        "compression": "snappy",
+        "settings": {
+          "parquet_engine": "pyarrow",
+          "index": false
+        }
+      },
+      "outputs": {
+        "KXBTC": {
+          "rows": 1010733,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 1,
+          "bytes": 118413735
+        },
+        "KXETH": {
+          "rows": 110811,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 1,
+          "bytes": 15446302
+        }
+      },
+      "memory_before": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 3720462336,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125328384,
+        "load_average": [
+          11.76513671875,
+          8.31005859375,
+          4.66943359375
+        ]
+      },
+      "memory_after": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 5511712768,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125328384,
+        "load_average": [
+          6.51953125,
+          7.39208984375,
+          4.5126953125
+        ]
+      }
+    },
+    {
+      "engine": "pandas",
+      "number": 3,
+      "wall_seconds": 35.83253915,
+      "command": [
+        "/opt/asl-spark/venv/bin/python",
+        "-B",
+        "-m",
+        "spark.benchmark",
+        "worker",
+        "--engine",
+        "pandas",
+        "--backfill",
+        "/mnt/c/Users/pikal/adverse-selection-lab/data/backfill",
+        "--output",
+        "/var/tmp/asl-benchmark-el2fypog/labels",
+        "--receipt",
+        "/var/tmp/asl-benchmark-el2fypog/worker.json"
+      ],
+      "log": "pandas_3.log",
+      "worker": {
+        "engine": "pandas",
+        "status": "PASS",
+        "compression": "snappy",
+        "settings": {
+          "parquet_engine": "pyarrow",
+          "index": false
+        }
+      },
+      "outputs": {
+        "KXBTC": {
+          "rows": 1010733,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 1,
+          "bytes": 118413735
+        },
+        "KXETH": {
+          "rows": 110811,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 1,
+          "bytes": 15446302
+        }
+      },
+      "memory_before": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 5519761408,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125328384,
+        "load_average": [
+          6.51953125,
+          7.39208984375,
+          4.5126953125
+        ]
+      },
+      "memory_after": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 5517025280,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125328384,
+        "load_average": [
+          4.12841796875,
+          6.69873046875,
+          4.38623046875
+        ]
+      }
+    },
+    {
+      "engine": "spark",
+      "number": 3,
+      "wall_seconds": 160.71224985599997,
+      "command": [
+        "/opt/asl-spark/venv/bin/python",
+        "-B",
+        "-m",
+        "spark.benchmark",
+        "worker",
+        "--engine",
+        "spark",
+        "--backfill",
+        "/mnt/c/Users/pikal/adverse-selection-lab/data/backfill",
+        "--output",
+        "/var/tmp/asl-benchmark-9eq6octc/labels",
+        "--receipt",
+        "/var/tmp/asl-benchmark-9eq6octc/worker.json"
+      ],
+      "log": "spark_3.log",
+      "worker": {
+        "engine": "spark",
+        "status": "PASS",
+        "compression": "snappy",
+        "settings": {
+          "master": "local[*]",
+          "default_parallelism": 8,
+          "spark.ui.showConsoleProgress": "false",
+          "jvm_max_heap_bytes": 1073741824,
+          "spark.sql.session.timeZone": "UTC",
+          "spark.sql.shuffle.partitions": "200",
+          "spark.sql.adaptive.enabled": "true",
+          "spark.sql.autoBroadcastJoinThreshold": "10485760b",
+          "spark.sql.execution.arrow.maxRecordsPerBatch": "10000"
+        }
+      },
+      "outputs": {
+        "KXBTC": {
+          "rows": 1010733,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 9,
+          "bytes": 143445379
+        },
+        "KXETH": {
+          "rows": 110811,
+          "columns": [
+            "trade_id",
+            "ticker",
+            "event_ticker",
+            "ts",
+            "close_time",
+            "tau_min",
+            "strike_type",
+            "floor_strike",
+            "cap_strike",
+            "price",
+            "qty",
+            "taker_outcome_side",
+            "maker_sign",
+            "settle_yes",
+            "spot",
+            "sigma",
+            "fv",
+            "maker_edge",
+            "stale_move_1m",
+            "stale_move_5m",
+            "mo_settle",
+            "mo_1m",
+            "mo_5m",
+            "mo_15m",
+            "move_1m",
+            "move_5m",
+            "move_15m"
+          ],
+          "part_files": 8,
+          "bytes": 16655194
+        }
+      },
+      "memory_before": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 5518102528,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125328384,
+        "load_average": [
+          4.12841796875,
+          6.69873046875,
+          4.38623046875
+        ]
+      },
+      "memory_after": {
+        "MemTotal_bytes": 6098735104,
+        "MemAvailable_bytes": 3879178240,
+        "SwapTotal_bytes": 2147483648,
+        "SwapFree_bytes": 2125328384,
+        "load_average": [
+          9.9384765625,
+          8.3662109375,
+          5.38671875
+        ]
+      }
+    }
+  ],
+  "protocol": {
+    "order": [
+      "pandas",
+      "spark",
+      "spark",
+      "pandas",
+      "pandas",
+      "spark"
+    ],
+    "runs_per_engine": 3,
+    "fresh_process_per_run": true,
+    "includes": [
+      "imports",
+      "Spark startup",
+      "input reads",
+      "engine validation",
+      "spot preparation",
+      "joins",
+      "labels",
+      "Snappy Parquet write",
+      "Spark stop and Python exit"
+    ],
+    "excludes": [
+      "input hashing",
+      "parent output validation",
+      "output removal",
+      "bootstrap summaries",
+      "parity comparison"
+    ],
+    "cache": "All input bytes hashed before timing; OS caches not flushed; no JVM reuse",
+    "output_filesystem": "/var/tmp (Linux disk); native file layout per engine"
+  },
+  "inputs": {
+    "digest": "8d0dfb1c7a34ea12d19a8048dc0613b59c928c736514736101daa830484ced30",
+    "files": 1401,
+    "bytes": 59818237
+  },
+  "code_sha256": {
+    "src/asl/markouts.py": "027764f07e545322ce9a5aedf7324b99f934107752e8b4b0e1bfc155e80ba615",
+    "src/asl/pricer.py": "9e64afa1520c8633ddfe2f4e3cb8e3301bf331c62a3ec935d54c1c4dba2f7d58",
+    "src/asl/fixed.py": "a21b30bb311b33ab712c9a486a189316f54d15309bbda1cd47198e0b1fd798a2",
+    "spark/session.py": "9b34ee7353e8fabedae15ba4d6de8b8b5f6073de3bc98646213d1488d7fb76d4",
+    "spark/ingestion.py": "bc1402989cd12c35c296aaebf83d54793f6c299da0d13d6c6e3ecace7606e863",
+    "spark/spot.py": "168fd3da44fd8eb5fae4d68315810381629eeca1dfde166ee7c3dd382c352286",
+    "spark/pricer.py": "aaf6cd7543cb0af6d9cf8b829d0f0206bff4d844ceea9f6660f6de12adf6531d",
+    "spark/labels.py": "92305e901cbc1b8f622c1df09a6f3a43e96d8d7b454766a8ae6d4b13e907d5d7",
+    "spark/benchmark.py": "b664c5c2e6a9336f97f19d0849e5dfc1660f1c2288283a7f67270dd07205cce4"
+  },
+  "finished_utc": "2026-11-20T03:21:44.818884+00:00",
+  "median_seconds": {
+    "pandas": 36.53798611800005,
+    "spark": 175.04135288199996
+  },
+  "spark_over_pandas_ratio": 4.790667781105968,
+  "inputs_unchanged": true,
+  "engine_code_unchanged": true
+}
