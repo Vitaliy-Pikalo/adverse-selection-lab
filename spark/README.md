@@ -3,8 +3,8 @@
 This additive port uses Ubuntu under WSL2. The pandas pipeline in `src/asl/`,
 research outputs, collector, and deployment files remain unchanged. Environment
 setup, ingestion/joins, labels, and pytest parity gates are implemented.
-The measured local benchmark is below. A dedicated CI job is added in Phase 6;
-no Spark speedup is claimed on this dataset.
+The measured local benchmark and dedicated CI job are below. No Spark speedup
+is claimed on this dataset.
 
 ## Verified environment (November 19, 2026)
 
@@ -493,3 +493,27 @@ harness source hashes were unchanged. The measured engine baseline was commit
 `dab5a0f`, which had already passed the full parity gate. Only generated benchmark
 receipts/logs are retained; temporary labeled data was removed. No original
 research outputs, results, collector files, or deployments were modified.
+
+## Phase 6: CI and portfolio documentation
+
+The main [README](../README.md#pyspark-port-parity-before-performance) summarizes
+full parity, all six benchmark measurements, machine specifications, caveats,
+reproduction commands, and a resume bullet.
+
+[Spark parity CI](../.github/workflows/spark-parity.yml) runs on standard
+`ubuntu-24.04` GitHub-hosted runners with Python 3.11, Temurin JDK 17, and the same
+locked package versions. It installs into a separate virtual environment and
+runs ingestion tests, no-lookahead/pricing tests, and the synthetic sample parity
+gate with `-m "not spark_full"`. It never downloads the research dataset or runs
+the collector, backfill, bootstrap, full-data benchmark, or deployment.
+
+Equivalent local test command after setup:
+
+```powershell
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m pytest tests/test_spark_ingestion.py tests/test_spark_labels.py tests/test_spark_parity.py -m "not spark_full" -q -s -p no:cacheprovider
+```
+
+The original CI workflow is retained. Standard hosted runners are free for this
+public repository ([GitHub's runner policy](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)).
+The CI runner is a correctness check, not the laptop used for the benchmark.
+No Databricks execution or cluster-scale performance is claimed.
