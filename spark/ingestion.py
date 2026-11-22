@@ -5,7 +5,6 @@ file/row precedence used by pandas' keep-first deduplication. Identical duplicat
 rows are safe to collapse. No data is collected to pandas in this module.
 """
 
-import os
 from pathlib import Path
 
 from pyspark.sql import DataFrame, SparkSession
@@ -58,17 +57,7 @@ def load_trades(session: SparkSession, backfill: Path, series: str) -> DataFrame
     files = sorted((backfill / "trades").glob(f"{series}-*.parquet"))
     if not files:
         return session.createDataFrame([], TRADE_SCHEMA)
-    directory = backfill / "trades"
-    with os.scandir(directory) as entries:
-        has_subdirectories = any(entry.is_dir() for entry in entries)
-    reader = session.read.schema(TRADE_SCHEMA)
-    if has_subdirectories:
-        # Preserve the pandas top-level glob contract for unusual nested layouts.
-        raw = reader.parquet(*(str(path) for path in files))
-    else:
-        # One root path avoids a distributed listing task for every event file.
-        # Filtering at discovery also excludes unrelated series before any reads.
-        raw = reader.option("pathGlobFilter", f"{series}-*.parquet").parquet(str(directory))
+    raw = session.read.schema(TRADE_SCHEMA).parquet(*(str(path) for path in files))
     return identical_duplicates_only(raw, "trade_id")
 
 

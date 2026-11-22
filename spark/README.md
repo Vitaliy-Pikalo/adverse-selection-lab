@@ -517,3 +517,19 @@ The original CI workflow is retained. Standard hosted runners are free for this
 public repository ([GitHub's runner policy](https://docs.github.com/en/actions/reference/runners/github-hosted-runners)).
 The CI runner is a correctness check, not the laptop used for the benchmark.
 No Databricks execution or cluster-scale performance is claimed.
+
+## Profiling and optimization extension
+
+The [case study](OPTIMIZATION.md) contains before/after formatted plans, task and
+I/O metrics, a controlled nine-run comparison, a results figure, and replay
+commands. The directory candidate at `ddb26e4` reduced scheduled tasks from
+1,557 to 160 but had a 179.34-second median versus 160.04 seconds for original
+Spark in that experiment. It was not selected as the default; the original
+reader is retained. Full-data parity passed for both implementations.
+
+The historical six-run benchmark above is preserved unchanged. To replay the
+separate candidate experiment, freeze both revisions explicitly:
+
+```powershell
+wsl -d Ubuntu -u root --cd /mnt/c/Users/pikal/adverse-selection-lab --exec /opt/asl-spark/venv/bin/python -B -m spark.benchmark run --backfill data/backfill --baseline-ref 819cfdf --candidate-ref ddb26e4
+```

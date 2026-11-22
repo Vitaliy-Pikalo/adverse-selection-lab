@@ -8,6 +8,8 @@ Status: **Milestone 2 — markout labels done.** First result (EXPERIMENT_LOG A0
 
 This project is research and paper simulation only. The code has no order-placement path.
 
+Engineering extension: [PySpark parity, profiling, and a measured optimization decision](spark/OPTIMIZATION.md).
+
 ## Setup (Windows PowerShell)
 
 ```powershell
@@ -74,6 +76,18 @@ pandas pipeline, stored research outputs, collector, and deployment are unchange
 The A0 maker-loss result and unsupported pre-set directional hypothesis remain
 research findings; this port adds an engineering validation of the pipeline.
 
+```mermaid
+flowchart LR
+    T[Trade and market Parquet] --> R[Typed reads and duplicate guards]
+    R --> E[Market join and eligibility]
+    S[1-minute spot candles] --> V[Minute grid and lagged volatility]
+    E --> J[Minute-key broadcast joins]
+    V --> J
+    J --> L[27 label columns and batched CDF]
+    L --> P[Full-data pytest parity]
+    O[Original pandas reference] --> P
+```
+
 **Full-data pytest parity passed for both series:** 27 columns, exact trade keys,
 row counts, timestamps, missing-value masks, signs, settlements, prices, quantities,
 and spot; remaining floats use `rtol=1e-10, atol=1e-12`. Settlement markouts matched
@@ -125,3 +139,29 @@ Portfolio/resume bullet:
 > Ported a 1.12M-trade labeling pipeline to PySpark using window functions and
 > broadcast joins; verified 27-column parity with pytest and automated sample
 > parity checks in GitHub Actions.
+
+### Execution-plan and optimization case study
+
+I profiled the full Spark workload, tested a directory-read candidate, and measured
+it against a frozen original implementation in nine interleaved trials. The
+candidate removed **1,397 metadata tasks** (**1,557 → 160 total tasks**) while
+preserving full-data parity. Its median was **179.34 s**, versus **160.04 s** for
+the original Spark control, so the original reader remains the default.
+
+![Measured latency and scheduler task counts](spark/figures/optimization.png)
+
+This is a documented negative optimization result: fewer scheduled tasks did not
+produce a faster local batch. All raw trials are retained; input/shuffle bytes
+and the label query stayed unchanged. The historical benchmark above is not used
+as the control for this new experiment.
+
+[Case study, plans, event metrics, caveats, and replay commands](spark/OPTIMIZATION.md) ·
+[Nine-run receipt](spark/benchmarks/20261122T004456Z/results.json) ·
+[Original profile](spark/profiles/20261122T001655Z-baseline/summary.json) ·
+[Candidate profile](spark/profiles/20261122T003850Z-optimized/summary.json)
+
+Alternative resume bullet with a profiling focus:
+
+> Built a PySpark labeling pipeline for 1.12M trades with 27-column pandas parity
+> and CI; used execution plans and scheduler metrics to evaluate an 89.7%
+> task-reduction candidate against frozen benchmark controls.

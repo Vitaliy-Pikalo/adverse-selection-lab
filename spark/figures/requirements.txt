@@ -1,0 +1,2 @@
+# Optional plotting environment only; never install into the benchmark environment.
+matplotlib==3.11.2

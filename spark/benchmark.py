@@ -106,6 +106,29 @@ def input_manifest(backfill: Path) -> dict:
             "bytes": sum(entry["bytes"] for entry in entries), "entries": entries}
 
 
+def freeze_source(ref: str, role: str, stack: ExitStack) -> tuple[Path, dict]:
+    """Extract a trusted local Git revision without changing the working branch."""
+    commit = subprocess.check_output(
+        ["git", "rev-parse", "--verify", ref + "^{commit}"], cwd=ROOT, text=True,
+    ).strip()
+    parent = ROOT / "data" / "spark-port"
+    parent.mkdir(parents=True, exist_ok=True)
+    snapshot = Path(stack.enter_context(TemporaryDirectory(
+        prefix=f"benchmark-{role}-", dir=parent,
+    )))
+    archive = snapshot / "snapshot.tar"
+    with archive.open("wb") as stream:
+        subprocess.run(["git", "archive", commit], cwd=ROOT, stdout=stream, check=True)
+    with tarfile.open(archive) as bundle:
+        bundle.extractall(snapshot, filter="data")
+    archive.unlink()
+    return snapshot, {
+        "git_ref": ref, "git_commit": commit,
+        "code_sha256": {name: sha256(snapshot / name) for name in CODE_FILES},
+        "code_storage": "temporary snapshot on the repository filesystem (data/spark-port)",
+    }
+
+
 def worker(args) -> None:
     output = args.output
     output.mkdir(parents=True, exist_ok=False)
@@ -254,42 +277,24 @@ def run(args) -> None:
     counters = dict.fromkeys(order, 0)
     with ExitStack() as stack:
         roots = dict.fromkeys(counters, ROOT)
-        baseline_hashes = None
-        if args.baseline_ref:
-            baseline_sha = subprocess.check_output(
-                ["git", "rev-parse", "--verify", args.baseline_ref + "^{commit}"],
-                cwd=ROOT, text=True,
-            ).strip()
-            snapshot_parent = ROOT / "data" / "spark-port"
-            snapshot_parent.mkdir(parents=True, exist_ok=True)
-            snapshot = Path(stack.enter_context(TemporaryDirectory(
-                prefix="benchmark-baseline-", dir=snapshot_parent,
-            )))
-            archive = snapshot / "snapshot.tar"
-            with archive.open("wb") as stream:
-                subprocess.run(
-                    ["git", "archive", baseline_sha], cwd=ROOT, stdout=stream, check=True,
-                )
-            with tarfile.open(archive) as bundle:
-                bundle.extractall(snapshot, filter="data")
-            archive.unlink()
-            roots["spark_baseline"] = snapshot
-            baseline_hashes = {name: sha256(snapshot / name) for name in CODE_FILES}
-            report["baseline"] = {
-                "git_ref": args.baseline_ref, "git_commit": baseline_sha,
-                "code_sha256": baseline_hashes,
-                "code_storage": "temporary snapshot on the repository filesystem (data/spark-port)",
-            }
+        snapshots = {}
+        for role, engine, ref in (
+            ("baseline", "spark_baseline", args.baseline_ref),
+            ("candidate", "spark", args.candidate_ref),
+        ):
+            if ref:
+                roots[engine], report[role] = freeze_source(ref, role, stack)
+                snapshots[engine] = report[role]["code_sha256"]
         try:
             run_trials(report, directory, backfill, order, counters, roots)
             print("Rehashing inputs and checking engine code after all runs", flush=True)
             assert input_manifest(backfill)["digest"] == manifest["digest"], "Input data changed"
             final_hashes = {name: sha256(ROOT / name) for name in CODE_FILES}
             assert final_hashes == code_hashes, "Engine code changed"
-            if baseline_hashes is not None:
+            for engine, hashes in snapshots.items():
                 assert {
-                    name: sha256(roots["spark_baseline"] / name) for name in CODE_FILES
-                } == baseline_hashes, "Baseline code changed"
+                    name: sha256(roots[engine] / name) for name in CODE_FILES
+                } == hashes, f"Frozen {engine} code changed"
             medians = {
                 engine: statistics.median(item["wall_seconds"] for item in report["runs"]
                                           if item["engine"] == engine)
@@ -360,6 +365,7 @@ def main() -> None:
     )
     parent.add_argument("--backfill", type=Path, default=ROOT / "data" / "backfill")
     parent.add_argument("--baseline-ref", help="Interleave three Spark control runs from a Git ref")
+    parent.add_argument("--candidate-ref", help="Run Spark trials from a frozen candidate Git ref")
     child = subparsers.add_parser("worker", help="Internal single-engine command")
     child.add_argument("--engine", choices=["pandas", "spark"], required=True)
     child.add_argument("--backfill", type=Path, required=True)
