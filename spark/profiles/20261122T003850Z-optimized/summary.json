@@ -1,0 +1,898 @@
+{
+  "label": "optimized",
+  "started_utc": "2026-11-22T00:38:50.877304+00:00",
+  "plans": {
+    "KXBTC": {
+      "file": "KXBTC_plan.txt",
+      "node_counts": {
+        "Scan parquet": 14,
+        "Filter": 8,
+        "HashAggregate": 26,
+        "Exchange": 13,
+        "Project": 22,
+        "BroadcastExchange": 13,
+        "BroadcastHashJoin": 13,
+        "Generate": 6,
+        "Sort": 1,
+        "Window": 2,
+        "ArrowEvalPython": 4,
+        "AdaptiveSparkPlan": 1
+      }
+    },
+    "KXETH": {
+      "file": "KXETH_plan.txt",
+      "node_counts": {
+        "Scan parquet": 14,
+        "Filter": 8,
+        "HashAggregate": 26,
+        "Exchange": 13,
+        "Project": 22,
+        "BroadcastExchange": 13,
+        "BroadcastHashJoin": 13,
+        "Generate": 6,
+        "Sort": 1,
+        "Window": 2,
+        "ArrowEvalPython": 4,
+        "AdaptiveSparkPlan": 1
+      }
+    }
+  },
+  "application_id": "local-1795307943683",
+  "listing_threshold": "32",
+  "instrumented_wall_seconds": 276.5303039280002,
+  "outputs": {
+    "KXBTC": {
+      "rows": 1010733,
+      "columns": [
+        "trade_id",
+        "ticker",
+        "event_ticker",
+        "ts",
+        "close_time",
+        "tau_min",
+        "strike_type",
+        "floor_strike",
+        "cap_strike",
+        "price",
+        "qty",
+        "taker_outcome_side",
+        "maker_sign",
+        "settle_yes",
+        "spot",
+        "sigma",
+        "fv",
+        "maker_edge",
+        "stale_move_1m",
+        "stale_move_5m",
+        "mo_settle",
+        "mo_1m",
+        "mo_5m",
+        "mo_15m",
+        "move_1m",
+        "move_5m",
+        "move_15m"
+      ],
+      "part_files": 9,
+      "bytes": 143445379
+    },
+    "KXETH": {
+      "rows": 110811,
+      "columns": [
+        "trade_id",
+        "ticker",
+        "event_ticker",
+        "ts",
+        "close_time",
+        "tau_min",
+        "strike_type",
+        "floor_strike",
+        "cap_strike",
+        "price",
+        "qty",
+        "taker_outcome_side",
+        "maker_sign",
+        "settle_yes",
+        "spot",
+        "sigma",
+        "fv",
+        "maker_edge",
+        "stale_move_1m",
+        "stale_move_5m",
+        "mo_settle",
+        "mo_1m",
+        "mo_5m",
+        "mo_15m",
+        "move_1m",
+        "move_5m",
+        "move_15m"
+      ],
+      "part_files": 8,
+      "bytes": 16655194
+    }
+  },
+  "metrics": {
+    "jobs": [
+      {
+        "id": 0,
+        "start_ms": 1795307999695,
+        "description": "",
+        "stage_ids": [
+          0
+        ],
+        "duration_ms": 27059,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 1,
+        "start_ms": 1795308027462,
+        "description": "",
+        "stage_ids": [
+          1,
+          2
+        ],
+        "duration_ms": 4362,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 2,
+        "start_ms": 1795308032397,
+        "description": "",
+        "stage_ids": [
+          3,
+          4,
+          5
+        ],
+        "duration_ms": 710,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 3,
+        "start_ms": 1795308033151,
+        "description": "",
+        "stage_ids": [
+          6,
+          7,
+          8
+        ],
+        "duration_ms": 609,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 4,
+        "start_ms": 1795308033796,
+        "description": "",
+        "stage_ids": [
+          9,
+          10,
+          11
+        ],
+        "duration_ms": 532,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 5,
+        "start_ms": 1795308035255,
+        "description": "",
+        "stage_ids": [
+          12
+        ],
+        "duration_ms": 1264,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 6,
+        "start_ms": 1795308036650,
+        "description": "",
+        "stage_ids": [
+          13,
+          14
+        ],
+        "duration_ms": 396,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 7,
+        "start_ms": 1795308037835,
+        "description": "",
+        "stage_ids": [
+          15
+        ],
+        "duration_ms": 980,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 8,
+        "start_ms": 1795308038988,
+        "description": "",
+        "stage_ids": [
+          16,
+          17
+        ],
+        "duration_ms": 519,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 9,
+        "start_ms": 1795308039653,
+        "description": "",
+        "stage_ids": [
+          18,
+          19,
+          20
+        ],
+        "duration_ms": 236,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 10,
+        "start_ms": 1795308051664,
+        "description": "",
+        "stage_ids": [
+          21
+        ],
+        "duration_ms": 240,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 11,
+        "start_ms": 1795308051692,
+        "description": "",
+        "stage_ids": [
+          22
+        ],
+        "duration_ms": 519,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 12,
+        "start_ms": 1795308051723,
+        "description": "",
+        "stage_ids": [
+          23
+        ],
+        "duration_ms": 14713,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 13,
+        "start_ms": 1795308051762,
+        "description": "",
+        "stage_ids": [
+          24
+        ],
+        "duration_ms": 12394,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 14,
+        "start_ms": 1795308052688,
+        "description": "",
+        "stage_ids": [
+          25,
+          26
+        ],
+        "duration_ms": 9854,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 15,
+        "start_ms": 1795308052750,
+        "description": "",
+        "stage_ids": [
+          25,
+          27
+        ],
+        "duration_ms": 10052,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 16,
+        "start_ms": 1795308063313,
+        "description": "",
+        "stage_ids": [
+          28,
+          29
+        ],
+        "duration_ms": 139,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 17,
+        "start_ms": 1795308063520,
+        "description": "",
+        "stage_ids": [
+          30,
+          31
+        ],
+        "duration_ms": 2677,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 18,
+        "start_ms": 1795308067655,
+        "description": "",
+        "stage_ids": [
+          32,
+          33
+        ],
+        "duration_ms": 44536,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 19,
+        "start_ms": 1795308145074,
+        "description": "",
+        "stage_ids": [
+          34
+        ],
+        "duration_ms": 12376,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 20,
+        "start_ms": 1795308157481,
+        "description": "",
+        "stage_ids": [
+          35,
+          36
+        ],
+        "duration_ms": 378,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 21,
+        "start_ms": 1795308157894,
+        "description": "",
+        "stage_ids": [
+          37,
+          38,
+          39
+        ],
+        "duration_ms": 50,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 22,
+        "start_ms": 1795308157953,
+        "description": "",
+        "stage_ids": [
+          40,
+          41,
+          42
+        ],
+        "duration_ms": 62,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 23,
+        "start_ms": 1795308158394,
+        "description": "",
+        "stage_ids": [
+          43
+        ],
+        "duration_ms": 961,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 24,
+        "start_ms": 1795308159396,
+        "description": "",
+        "stage_ids": [
+          44,
+          45
+        ],
+        "duration_ms": 339,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 25,
+        "start_ms": 1795308160338,
+        "description": "",
+        "stage_ids": [
+          46
+        ],
+        "duration_ms": 529,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 26,
+        "start_ms": 1795308160915,
+        "description": "",
+        "stage_ids": [
+          48,
+          47
+        ],
+        "duration_ms": 263,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 27,
+        "start_ms": 1795308161261,
+        "description": "",
+        "stage_ids": [
+          49,
+          50,
+          51
+        ],
+        "duration_ms": 140,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 28,
+        "start_ms": 1795308172687,
+        "description": "",
+        "stage_ids": [
+          52
+        ],
+        "duration_ms": 307,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 29,
+        "start_ms": 1795308172792,
+        "description": "",
+        "stage_ids": [
+          53
+        ],
+        "duration_ms": 385,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 30,
+        "start_ms": 1795308172881,
+        "description": "",
+        "stage_ids": [
+          54
+        ],
+        "duration_ms": 2192,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 31,
+        "start_ms": 1795308172968,
+        "description": "",
+        "stage_ids": [
+          55
+        ],
+        "duration_ms": 18970,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 32,
+        "start_ms": 1795308173418,
+        "description": "",
+        "stage_ids": [
+          56,
+          57
+        ],
+        "duration_ms": 11569,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 33,
+        "start_ms": 1795308173443,
+        "description": "",
+        "stage_ids": [
+          56,
+          58
+        ],
+        "duration_ms": 11798,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 34,
+        "start_ms": 1795308185368,
+        "description": "",
+        "stage_ids": [
+          59,
+          60
+        ],
+        "duration_ms": 1719,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 35,
+        "start_ms": 1795308185679,
+        "description": "",
+        "stage_ids": [
+          59,
+          61
+        ],
+        "duration_ms": 1276,
+        "result": "JobSucceeded"
+      },
+      {
+        "id": 36,
+        "start_ms": 1795308193949,
+        "description": "",
+        "stage_ids": [
+          62,
+          63
+        ],
+        "duration_ms": 15743,
+        "result": "JobSucceeded"
+      }
+    ],
+    "stages": [
+      {
+        "id": 0,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 23,
+        "completed_tasks": 23,
+        "executor_run_ms": 195738,
+        "input_bytes": 47764445,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 71241784
+      },
+      {
+        "id": 2,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 9,
+        "completed_tasks": 9,
+        "executor_run_ms": 31180,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 71241784,
+        "shuffle_write_bytes": 34444194
+      },
+      {
+        "id": 5,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 496,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 4138437,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 8,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 4,
+        "completed_tasks": 4,
+        "executor_run_ms": 1962,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 17059408,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 11,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 3,
+        "completed_tasks": 3,
+        "executor_run_ms": 1072,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 13246349,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 12,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:79",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 1174,
+        "input_bytes": 626886,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 1125662
+      },
+      {
+        "id": 14,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:79",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 322,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 1125662,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 15,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 934,
+        "input_bytes": 908868,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 810502
+      },
+      {
+        "id": 17,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 453,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 810502,
+        "shuffle_write_bytes": 352196
+      },
+      {
+        "id": 20,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 185,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 352196,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 21,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 180,
+        "input_bytes": 347556,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 67
+      },
+      {
+        "id": 22,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 474,
+        "input_bytes": 908868,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 810502
+      },
+      {
+        "id": 23,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 23,
+        "completed_tasks": 23,
+        "executor_run_ms": 107477,
+        "input_bytes": 47764445,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 71241784
+      },
+      {
+        "id": 24,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 1720,
+        "input_bytes": 787509,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 26,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 257,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 810502,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 27,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 227,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 810502,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 29,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 111,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 67,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 31,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 2597,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 67,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 33,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 9,
+        "completed_tasks": 9,
+        "executor_run_ms": 333951,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 71241784,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 34,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 22,
+        "completed_tasks": 22,
+        "executor_run_ms": 86771,
+        "input_bytes": 11227098,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 9603163
+      },
+      {
+        "id": 36,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 8,
+        "completed_tasks": 8,
+        "executor_run_ms": 2415,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 9603163,
+        "shuffle_write_bytes": 4075072
+      },
+      {
+        "id": 39,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 31,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 1016120,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 42,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 3,
+        "completed_tasks": 3,
+        "executor_run_ms": 110,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 3058952,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 43,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:79",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 932,
+        "input_bytes": 927942,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 1702411
+      },
+      {
+        "id": 45,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:79",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 307,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 1702411,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 46,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 499,
+        "input_bytes": 716300,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 769866
+      },
+      {
+        "id": 48,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 230,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 769866,
+        "shuffle_write_bytes": 352231
+      },
+      {
+        "id": 51,
+        "name": "take at /mnt/c/Users/pikal/adverse-selection-lab/spark/ingestion.py:49",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 81,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 352231,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 52,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 130,
+        "input_bytes": 347547,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 67
+      },
+      {
+        "id": 53,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 242,
+        "input_bytes": 716300,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 769866
+      },
+      {
+        "id": 54,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 1766,
+        "input_bytes": 1150956,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 55,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 22,
+        "completed_tasks": 22,
+        "executor_run_ms": 134179,
+        "input_bytes": 11227098,
+        "shuffle_read_bytes": 0,
+        "shuffle_write_bytes": 9603163
+      },
+      {
+        "id": 57,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 194,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 769866,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 58,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 164,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 769866,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 60,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 1646,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 67,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 61,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 1,
+        "completed_tasks": 1,
+        "executor_run_ms": 52,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 67,
+        "shuffle_write_bytes": 0
+      },
+      {
+        "id": 63,
+        "name": "$anonfun$withThreadLocalCaptured$2 at CompletableFuture.java:1768",
+        "planned_tasks": 8,
+        "completed_tasks": 8,
+        "executor_run_ms": 116282,
+        "input_bytes": 0,
+        "shuffle_read_bytes": 9603163,
+        "shuffle_write_bytes": 0
+      }
+    ],
+    "total_tasks": 160,
+    "listing_jobs": 0,
+    "listing_job_wall_ms": 0,
+    "listing_tasks": 0,
+    "total_executor_run_ms": 1026541,
+    "input_bytes": 125421818,
+    "shuffle_read_bytes": 208483032,
+    "shuffle_write_bytes": 206902530
+  },
+  "status": "PASS"
+}

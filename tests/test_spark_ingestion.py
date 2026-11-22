@@ -112,3 +112,21 @@ def test_no_trade_files_returns_typed_empty_frame(session, backfill):
     result = load_trades(session, backfill, "KXETH")
     assert result.count() == 0
     assert result.schema["yes_price"].dataType.simpleString() == "bigint"
+
+
+def test_trade_reader_excludes_unrelated_series_before_parquet_read(session, backfill):
+    # A corrupt other-series file must not even be opened by this reader.
+    (backfill / "trades" / "KXETH-unrelated.parquet").write_bytes(b"not parquet")
+    result = load_trades(session, backfill, "KXBTC")
+    assert result.count() == 7  # eight physical rows, including an identical duplicate
+
+
+def test_trade_reader_preserves_top_level_glob_with_nested_directories(session, backfill):
+    nested = backfill / "trades" / "nested"
+    nested.mkdir()
+    rows = pd.read_parquet(backfill / "trades" / "KXBTC-E.parquet").iloc[:1].copy()
+    rows["trade_id"] = "nested-should-not-appear"
+    rows.to_parquet(nested / "KXBTC-nested.parquet", index=False)
+    result = load_trades(session, backfill, "KXBTC")
+    ids = {row.trade_id for row in result.select("trade_id").collect()}
+    assert "nested-should-not-appear" not in ids

@@ -1,0 +1,756 @@
+== Physical Plan ==
+AdaptiveSparkPlan (123)
++- Project (122)
+   +- Project (121)
+      +- ArrowEvalPython (120)
+         +- Project (119)
+            +- ArrowEvalPython (118)
+               +- Project (117)
+                  +- ArrowEvalPython (116)
+                     +- Project (115)
+                        +- ArrowEvalPython (114)
+                           +- Project (113)
+                              +- BroadcastHashJoin LeftOuter BuildRight (112)
+                                 :- Project (97)
+                                 :  +- BroadcastHashJoin LeftOuter BuildRight (96)
+                                 :     :- Project (81)
+                                 :     :  +- BroadcastHashJoin LeftOuter BuildRight (80)
+                                 :     :     :- Project (65)
+                                 :     :     :  +- BroadcastHashJoin LeftOuter BuildRight (64)
+                                 :     :     :     :- Project (49)
+                                 :     :     :     :  +- BroadcastHashJoin LeftOuter BuildRight (48)
+                                 :     :     :     :     :- Project (33)
+                                 :     :     :     :     :  +- BroadcastHashJoin LeftOuter BuildRight (32)
+                                 :     :     :     :     :     :- Project (11)
+                                 :     :     :     :     :     :  +- BroadcastHashJoin Inner BuildRight (10)
+                                 :     :     :     :     :     :     :- HashAggregate (5)
+                                 :     :     :     :     :     :     :  +- Exchange (4)
+                                 :     :     :     :     :     :     :     +- HashAggregate (3)
+                                 :     :     :     :     :     :     :        +- Filter (2)
+                                 :     :     :     :     :     :     :           +- Scan parquet  (1)
+                                 :     :     :     :     :     :     +- BroadcastExchange (9)
+                                 :     :     :     :     :     :        +- Project (8)
+                                 :     :     :     :     :     :           +- Filter (7)
+                                 :     :     :     :     :     :              +- Scan parquet  (6)
+                                 :     :     :     :     :     +- BroadcastExchange (31)
+                                 :     :     :     :     :        +- Project (30)
+                                 :     :     :     :     :           +- Window (29)
+                                 :     :     :     :     :              +- Project (28)
+                                 :     :     :     :     :                 +- Project (27)
+                                 :     :     :     :     :                    +- Window (26)
+                                 :     :     :     :     :                       +- Sort (25)
+                                 :     :     :     :     :                          +- Project (24)
+                                 :     :     :     :     :                             +- BroadcastHashJoin LeftOuter BuildRight (23)
+                                 :     :     :     :     :                                :- Generate (16)
+                                 :     :     :     :     :                                :  +- HashAggregate (15)
+                                 :     :     :     :     :                                :     +- Exchange (14)
+                                 :     :     :     :     :                                :        +- HashAggregate (13)
+                                 :     :     :     :     :                                :           +- Scan parquet  (12)
+                                 :     :     :     :     :                                +- BroadcastExchange (22)
+                                 :     :     :     :     :                                   +- HashAggregate (21)
+                                 :     :     :     :     :                                      +- Exchange (20)
+                                 :     :     :     :     :                                         +- HashAggregate (19)
+                                 :     :     :     :     :                                            +- Filter (18)
+                                 :     :     :     :     :                                               +- Scan parquet  (17)
+                                 :     :     :     :     +- BroadcastExchange (47)
+                                 :     :     :     :        +- Project (46)
+                                 :     :     :     :           +- BroadcastHashJoin LeftOuter BuildRight (45)
+                                 :     :     :     :              :- Generate (38)
+                                 :     :     :     :              :  +- HashAggregate (37)
+                                 :     :     :     :              :     +- Exchange (36)
+                                 :     :     :     :              :        +- HashAggregate (35)
+                                 :     :     :     :              :           +- Scan parquet  (34)
+                                 :     :     :     :              +- BroadcastExchange (44)
+                                 :     :     :     :                 +- HashAggregate (43)
+                                 :     :     :     :                    +- Exchange (42)
+                                 :     :     :     :                       +- HashAggregate (41)
+                                 :     :     :     :                          +- Filter (40)
+                                 :     :     :     :                             +- Scan parquet  (39)
+                                 :     :     :     +- BroadcastExchange (63)
+                                 :     :     :        +- Project (62)
+                                 :     :     :           +- BroadcastHashJoin LeftOuter BuildRight (61)
+                                 :     :     :              :- Generate (54)
+                                 :     :     :              :  +- HashAggregate (53)
+                                 :     :     :              :     +- Exchange (52)
+                                 :     :     :              :        +- HashAggregate (51)
+                                 :     :     :              :           +- Scan parquet  (50)
+                                 :     :     :              +- BroadcastExchange (60)
+                                 :     :     :                 +- HashAggregate (59)
+                                 :     :     :                    +- Exchange (58)
+                                 :     :     :                       +- HashAggregate (57)
+                                 :     :     :                          +- Filter (56)
+                                 :     :     :                             +- Scan parquet  (55)
+                                 :     :     +- BroadcastExchange (79)
+                                 :     :        +- Project (78)
+                                 :     :           +- BroadcastHashJoin LeftOuter BuildRight (77)
+                                 :     :              :- Generate (70)
+                                 :     :              :  +- HashAggregate (69)
+                                 :     :              :     +- Exchange (68)
+                                 :     :              :        +- HashAggregate (67)
+                                 :     :              :           +- Scan parquet  (66)
+                                 :     :              +- BroadcastExchange (76)
+                                 :     :                 +- HashAggregate (75)
+                                 :     :                    +- Exchange (74)
+                                 :     :                       +- HashAggregate (73)
+                                 :     :                          +- Filter (72)
+                                 :     :                             +- Scan parquet  (71)
+                                 :     +- BroadcastExchange (95)
+                                 :        +- Project (94)
+                                 :           +- BroadcastHashJoin LeftOuter BuildRight (93)
+                                 :              :- Generate (86)
+                                 :              :  +- HashAggregate (85)
+                                 :              :     +- Exchange (84)
+                                 :              :        +- HashAggregate (83)
+                                 :              :           +- Scan parquet  (82)
+                                 :              +- BroadcastExchange (92)
+                                 :                 +- HashAggregate (91)
+                                 :                    +- Exchange (90)
+                                 :                       +- HashAggregate (89)
+                                 :                          +- Filter (88)
+                                 :                             +- Scan parquet  (87)
+                                 +- BroadcastExchange (111)
+                                    +- Project (110)
+                                       +- BroadcastHashJoin LeftOuter BuildRight (109)
+                                          :- Generate (102)
+                                          :  +- HashAggregate (101)
+                                          :     +- Exchange (100)
+                                          :        +- HashAggregate (99)
+                                          :           +- Scan parquet  (98)
+                                          +- BroadcastExchange (108)
+                                             +- HashAggregate (107)
+                                                +- Exchange (106)
+                                                   +- HashAggregate (105)
+                                                      +- Filter (104)
+                                                         +- Scan parquet  (103)
+
+
+(1) Scan parquet
+Output [7]: [trade_id#417, ticker#418, created_time#419, yes_price#420L, count#421L, taker_outcome_side#422, is_block_trade#423]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/trades/KXETH-26NOV0100.parquet, ... 692 entries]
+PushedFilters: [IsNotNull(created_time)]
+ReadSchema: struct<trade_id:string,ticker:string,created_time:string,yes_price:bigint,count:bigint,taker_outcome_side:string,is_block_trade:boolean>
+
+(2) Filter
+Input [7]: [trade_id#417, ticker#418, created_time#419, yes_price#420L, count#421L, taker_outcome_side#422, is_block_trade#423]
+Condition : (NOT coalesce(is_block_trade#423, false) AND isnotnull(created_time#419))
+
+(3) HashAggregate
+Input [7]: [trade_id#417, ticker#418, created_time#419, yes_price#420L, count#421L, taker_outcome_side#422, is_block_trade#423]
+Keys [7]: [trade_id#417, count#421L, created_time#419, taker_outcome_side#422, yes_price#420L, ticker#418, is_block_trade#423]
+Functions: []
+Aggregate Attributes: []
+Results [7]: [trade_id#417, count#421L, created_time#419, taker_outcome_side#422, yes_price#420L, ticker#418, is_block_trade#423]
+
+(4) Exchange
+Input [7]: [trade_id#417, count#421L, created_time#419, taker_outcome_side#422, yes_price#420L, ticker#418, is_block_trade#423]
+Arguments: hashpartitioning(trade_id#417, count#421L, created_time#419, taker_outcome_side#422, yes_price#420L, ticker#418, is_block_trade#423, 200), ENSURE_REQUIREMENTS, [plan_id=4621]
+
+(5) HashAggregate
+Input [7]: [trade_id#417, count#421L, created_time#419, taker_outcome_side#422, yes_price#420L, ticker#418, is_block_trade#423]
+Keys [7]: [trade_id#417, count#421L, created_time#419, taker_outcome_side#422, yes_price#420L, ticker#418, is_block_trade#423]
+Functions: []
+Aggregate Attributes: []
+Results [6]: [trade_id#417, ticker#418, created_time#419, yes_price#420L, count#421L, taker_outcome_side#422]
+
+(6) Scan parquet
+Output [7]: [ticker#436, event_ticker#437, strike_type#438, floor_strike#439, cap_strike#440, close_time#441, result#442]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/markets_KXETH.parquet]
+ReadSchema: struct<ticker:string,event_ticker:string,strike_type:string,floor_strike:string,cap_strike:string,close_time:string,result:string>
+
+(7) Filter
+Input [7]: [ticker#436, event_ticker#437, strike_type#438, floor_strike#439, cap_strike#440, close_time#441, result#442]
+Condition : (CASE WHEN (result#442 = yes) THEN true WHEN (result#442 = no) THEN true ELSE false END AND isnotnull(cast(close_time#441 as timestamp)))
+
+(8) Project
+Output [7]: [ticker#436, event_ticker#437, strike_type#438, try_cast(floor_strike#439 as double) AS floor_strike#455, try_cast(cap_strike#440 as double) AS cap_strike#456, cast(close_time#441 as timestamp) AS close_time#457, CASE WHEN (result#442 = yes) THEN 1.0 WHEN (result#442 = no) THEN 0.0 END AS settle_yes#458]
+Input [7]: [ticker#436, event_ticker#437, strike_type#438, floor_strike#439, cap_strike#440, close_time#441, result#442]
+
+(9) BroadcastExchange
+Input [7]: [ticker#436, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458]
+Arguments: HashedRelationBroadcastMode(List(coalesce(input[0, string, true], ), isnull(input[0, string, true])),false), [plan_id=4624]
+
+(10) BroadcastHashJoin
+Left keys [2]: [coalesce(ticker#418, ), isnull(ticker#418)]
+Right keys [2]: [coalesce(ticker#436, ), isnull(ticker#436)]
+Join type: Inner
+Join condition: (cast(created_time#419 as timestamp) < close_time#457)
+
+(11) Project
+Output [12]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, cast(created_time#419 as timestamp) AS ts#500]
+Input [13]: [trade_id#417, ticker#418, created_time#419, yes_price#420L, count#421L, taker_outcome_side#422, ticker#436, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458]
+
+(12) Scan parquet
+Output [1]: [time#459]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+ReadSchema: struct<time:timestamp>
+
+(13) HashAggregate
+Input [1]: [time#459]
+Keys: []
+Functions [2]: [partial_min(time#459), partial_max(time#459)]
+Aggregate Attributes [2]: [min#685, max#686]
+Results [2]: [min#687, max#688]
+
+(14) Exchange
+Input [2]: [min#687, max#688]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=4627]
+
+(15) HashAggregate
+Input [2]: [min#687, max#688]
+Keys: []
+Functions [2]: [min(time#459), max(time#459)]
+Aggregate Attributes [2]: [min(time#459)#475, max(time#459)#476]
+Results [2]: [min(time#459)#475 AS start#470, max(time#459)#476 AS end#471]
+
+(16) Generate
+Input [2]: [start#470, end#471]
+Arguments: explode(sequence(start#470, end#471, Some(INTERVAL '01' MINUTE), Some(UTC))), false, [minute#478]
+
+(17) Scan parquet
+Output [3]: [time#479, open#480, close#481]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+PushedFilters: [IsNotNull(time)]
+ReadSchema: struct<time:timestamp,open:double,close:double>
+
+(18) Filter
+Input [3]: [time#479, open#480, close#481]
+Condition : isnotnull(time#479)
+
+(19) HashAggregate
+Input [3]: [time#479, open#480, close#481]
+Keys [3]: [time#479, knownfloatingpointnormalized(normalizenanandzero(open#480)) AS open#480, knownfloatingpointnormalized(normalizenanandzero(close#481)) AS close#481]
+Functions: []
+Aggregate Attributes: []
+Results [3]: [time#479, open#480, close#481]
+
+(20) Exchange
+Input [3]: [time#479, open#480, close#481]
+Arguments: hashpartitioning(time#479, open#480, close#481, 200), ENSURE_REQUIREMENTS, [plan_id=4630]
+
+(21) HashAggregate
+Input [3]: [time#479, open#480, close#481]
+Keys [3]: [time#479, open#480, close#481]
+Functions: []
+Aggregate Attributes: []
+Results [3]: [time#479, open#480, close#481]
+
+(22) BroadcastExchange
+Input [3]: [time#479, open#480, close#481]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, true]),false), [plan_id=4633]
+
+(23) BroadcastHashJoin
+Left keys [1]: [minute#478]
+Right keys [1]: [time#479]
+Join type: LeftOuter
+Join condition: None
+
+(24) Project
+Output [3]: [minute#478, open#480, ln(close#481) AS _log_close#483]
+Input [4]: [minute#478, time#479, open#480, close#481]
+
+(25) Sort
+Input [3]: [minute#478, open#480, _log_close#483]
+Arguments: [minute#478 ASC NULLS FIRST], false, 0
+
+(26) Window
+Input [3]: [minute#478, open#480, _log_close#483]
+Arguments: [lag(_log_close#483, -1, null) windowspecdefinition(minute#478 ASC NULLS FIRST, specifiedwindowframe(RowFrame, -1, -1)) AS _we0#485], [minute#478 ASC NULLS FIRST]
+
+(27) Project
+Output [3]: [minute#478, open#480, (_log_close#483 - _we0#485) AS _return#484]
+Input [4]: [minute#478, open#480, _log_close#483, _we0#485]
+
+(28) Project
+Output [3]: [minute#478, open#480, CASE WHEN ((isnotnull(_return#484) AND NOT isnan(_return#484)) AND NOT (abs(_return#484) = Infinity)) THEN _return#484 END AS _return#486]
+Input [3]: [minute#478, open#480, _return#484]
+
+(29) Window
+Input [3]: [minute#478, open#480, _return#486]
+Arguments: [count(_return#486) windowspecdefinition(minute#478 ASC NULLS FIRST, specifiedwindowframe(RowFrame, -60, -1)) AS _we0#498L, stddev_samp(_return#486) windowspecdefinition(minute#478 ASC NULLS FIRST, specifiedwindowframe(RowFrame, -60, -1)) AS _we1#499], [minute#478 ASC NULLS FIRST]
+
+(30) Project
+Output [3]: [minute#478 AS _spot_minute#501, open#480 AS spot#502, CASE WHEN (_we0#498L >= 30) THEN _we1#499 END AS sigma#487]
+Input [5]: [minute#478, open#480, _return#486, _we0#498L, _we1#499]
+
+(31) BroadcastExchange
+Input [3]: [_spot_minute#501, spot#502, sigma#487]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, false]),false), [plan_id=4644]
+
+(32) BroadcastHashJoin
+Left keys [1]: [date_trunc(minute, ts#500 + INTERVAL '00' MINUTE, Some(UTC))]
+Right keys [1]: [_spot_minute#501]
+Join type: LeftOuter
+Join condition: None
+
+(33) Project
+Output [14]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487]
+Input [15]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, _spot_minute#501, spot#502, sigma#487]
+
+(34) Scan parquet
+Output [1]: [time#505]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+ReadSchema: struct<time:timestamp>
+
+(35) HashAggregate
+Input [1]: [time#505]
+Keys: []
+Functions [2]: [partial_min(time#505), partial_max(time#505)]
+Aggregate Attributes [2]: [min#689, max#690]
+Results [2]: [min#691, max#692]
+
+(36) Exchange
+Input [2]: [min#691, max#692]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=4647]
+
+(37) HashAggregate
+Input [2]: [min#691, max#692]
+Keys: []
+Functions [2]: [min(time#505), max(time#505)]
+Aggregate Attributes [2]: [min(time#505)#475, max(time#505)#476]
+Results [2]: [min(time#505)#475 AS start#508, max(time#505)#476 AS end#509]
+
+(38) Generate
+Input [2]: [start#508, end#509]
+Arguments: explode(sequence(start#508, end#509, Some(INTERVAL '01' MINUTE), Some(UTC))), false, [minute#510]
+
+(39) Scan parquet
+Output [3]: [time#511, open#512, close#513]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+PushedFilters: [IsNotNull(time)]
+ReadSchema: struct<time:timestamp,open:double,close:double>
+
+(40) Filter
+Input [3]: [time#511, open#512, close#513]
+Condition : isnotnull(time#511)
+
+(41) HashAggregate
+Input [3]: [time#511, open#512, close#513]
+Keys [3]: [time#511, knownfloatingpointnormalized(normalizenanandzero(open#512)) AS open#512, knownfloatingpointnormalized(normalizenanandzero(close#513)) AS close#513]
+Functions: []
+Aggregate Attributes: []
+Results [3]: [time#511, open#512, close#513]
+
+(42) Exchange
+Input [3]: [time#511, open#512, close#513]
+Arguments: hashpartitioning(time#511, open#512, close#513, 200), ENSURE_REQUIREMENTS, [plan_id=4650]
+
+(43) HashAggregate
+Input [3]: [time#511, open#512, close#513]
+Keys [3]: [time#511, open#512, close#513]
+Functions: []
+Aggregate Attributes: []
+Results [2]: [time#511, open#512]
+
+(44) BroadcastExchange
+Input [2]: [time#511, open#512]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, true]),false), [plan_id=4653]
+
+(45) BroadcastHashJoin
+Left keys [1]: [minute#510]
+Right keys [1]: [time#511]
+Join type: LeftOuter
+Join condition: None
+
+(46) Project
+Output [2]: [minute#510 AS _spot_minute#503, open#512 AS spot_minus_1m#504]
+Input [3]: [minute#510, time#511, open#512]
+
+(47) BroadcastExchange
+Input [2]: [_spot_minute#503, spot_minus_1m#504]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, false]),false), [plan_id=4657]
+
+(48) BroadcastHashJoin
+Left keys [1]: [date_trunc(minute, ts#500 + INTERVAL '-01' MINUTE, Some(UTC))]
+Right keys [1]: [_spot_minute#503]
+Join type: LeftOuter
+Join condition: None
+
+(49) Project
+Output [15]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504]
+Input [16]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, _spot_minute#503, spot_minus_1m#504]
+
+(50) Scan parquet
+Output [1]: [time#533]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+ReadSchema: struct<time:timestamp>
+
+(51) HashAggregate
+Input [1]: [time#533]
+Keys: []
+Functions [2]: [partial_min(time#533), partial_max(time#533)]
+Aggregate Attributes [2]: [min#693, max#694]
+Results [2]: [min#695, max#696]
+
+(52) Exchange
+Input [2]: [min#695, max#696]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=4660]
+
+(53) HashAggregate
+Input [2]: [min#695, max#696]
+Keys: []
+Functions [2]: [min(time#533), max(time#533)]
+Aggregate Attributes [2]: [min(time#533)#475, max(time#533)#476]
+Results [2]: [min(time#533)#475 AS start#536, max(time#533)#476 AS end#537]
+
+(54) Generate
+Input [2]: [start#536, end#537]
+Arguments: explode(sequence(start#536, end#537, Some(INTERVAL '01' MINUTE), Some(UTC))), false, [minute#538]
+
+(55) Scan parquet
+Output [3]: [time#539, open#540, close#541]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+PushedFilters: [IsNotNull(time)]
+ReadSchema: struct<time:timestamp,open:double,close:double>
+
+(56) Filter
+Input [3]: [time#539, open#540, close#541]
+Condition : isnotnull(time#539)
+
+(57) HashAggregate
+Input [3]: [time#539, open#540, close#541]
+Keys [3]: [time#539, knownfloatingpointnormalized(normalizenanandzero(open#540)) AS open#540, knownfloatingpointnormalized(normalizenanandzero(close#541)) AS close#541]
+Functions: []
+Aggregate Attributes: []
+Results [3]: [time#539, open#540, close#541]
+
+(58) Exchange
+Input [3]: [time#539, open#540, close#541]
+Arguments: hashpartitioning(time#539, open#540, close#541, 200), ENSURE_REQUIREMENTS, [plan_id=4663]
+
+(59) HashAggregate
+Input [3]: [time#539, open#540, close#541]
+Keys [3]: [time#539, open#540, close#541]
+Functions: []
+Aggregate Attributes: []
+Results [2]: [time#539, open#540]
+
+(60) BroadcastExchange
+Input [2]: [time#539, open#540]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, true]),false), [plan_id=4666]
+
+(61) BroadcastHashJoin
+Left keys [1]: [minute#538]
+Right keys [1]: [time#539]
+Join type: LeftOuter
+Join condition: None
+
+(62) Project
+Output [2]: [minute#538 AS _spot_minute#531, open#540 AS spot_minus_5m#532]
+Input [3]: [minute#538, time#539, open#540]
+
+(63) BroadcastExchange
+Input [2]: [_spot_minute#531, spot_minus_5m#532]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, false]),false), [plan_id=4670]
+
+(64) BroadcastHashJoin
+Left keys [1]: [date_trunc(minute, ts#500 + INTERVAL '-05' MINUTE, Some(UTC))]
+Right keys [1]: [_spot_minute#531]
+Join type: LeftOuter
+Join condition: None
+
+(65) Project
+Output [16]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532]
+Input [17]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, _spot_minute#531, spot_minus_5m#532]
+
+(66) Scan parquet
+Output [1]: [time#561]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+ReadSchema: struct<time:timestamp>
+
+(67) HashAggregate
+Input [1]: [time#561]
+Keys: []
+Functions [2]: [partial_min(time#561), partial_max(time#561)]
+Aggregate Attributes [2]: [min#697, max#698]
+Results [2]: [min#699, max#700]
+
+(68) Exchange
+Input [2]: [min#699, max#700]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=4673]
+
+(69) HashAggregate
+Input [2]: [min#699, max#700]
+Keys: []
+Functions [2]: [min(time#561), max(time#561)]
+Aggregate Attributes [2]: [min(time#561)#475, max(time#561)#476]
+Results [2]: [min(time#561)#475 AS start#564, max(time#561)#476 AS end#565]
+
+(70) Generate
+Input [2]: [start#564, end#565]
+Arguments: explode(sequence(start#564, end#565, Some(INTERVAL '01' MINUTE), Some(UTC))), false, [minute#566]
+
+(71) Scan parquet
+Output [3]: [time#567, open#568, close#569]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+PushedFilters: [IsNotNull(time)]
+ReadSchema: struct<time:timestamp,open:double,close:double>
+
+(72) Filter
+Input [3]: [time#567, open#568, close#569]
+Condition : isnotnull(time#567)
+
+(73) HashAggregate
+Input [3]: [time#567, open#568, close#569]
+Keys [3]: [time#567, knownfloatingpointnormalized(normalizenanandzero(open#568)) AS open#568, knownfloatingpointnormalized(normalizenanandzero(close#569)) AS close#569]
+Functions: []
+Aggregate Attributes: []
+Results [3]: [time#567, open#568, close#569]
+
+(74) Exchange
+Input [3]: [time#567, open#568, close#569]
+Arguments: hashpartitioning(time#567, open#568, close#569, 200), ENSURE_REQUIREMENTS, [plan_id=4676]
+
+(75) HashAggregate
+Input [3]: [time#567, open#568, close#569]
+Keys [3]: [time#567, open#568, close#569]
+Functions: []
+Aggregate Attributes: []
+Results [2]: [time#567, open#568]
+
+(76) BroadcastExchange
+Input [2]: [time#567, open#568]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, true]),false), [plan_id=4679]
+
+(77) BroadcastHashJoin
+Left keys [1]: [minute#566]
+Right keys [1]: [time#567]
+Join type: LeftOuter
+Join condition: None
+
+(78) Project
+Output [2]: [minute#566 AS _spot_minute#559, open#568 AS spot_plus_1m#560]
+Input [3]: [minute#566, time#567, open#568]
+
+(79) BroadcastExchange
+Input [2]: [_spot_minute#559, spot_plus_1m#560]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, false]),false), [plan_id=4683]
+
+(80) BroadcastHashJoin
+Left keys [1]: [date_trunc(minute, ts#500 + INTERVAL '01' MINUTE, Some(UTC))]
+Right keys [1]: [_spot_minute#559]
+Join type: LeftOuter
+Join condition: None
+
+(81) Project
+Output [17]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560]
+Input [18]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, _spot_minute#559, spot_plus_1m#560]
+
+(82) Scan parquet
+Output [1]: [time#589]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+ReadSchema: struct<time:timestamp>
+
+(83) HashAggregate
+Input [1]: [time#589]
+Keys: []
+Functions [2]: [partial_min(time#589), partial_max(time#589)]
+Aggregate Attributes [2]: [min#701, max#702]
+Results [2]: [min#703, max#704]
+
+(84) Exchange
+Input [2]: [min#703, max#704]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=4686]
+
+(85) HashAggregate
+Input [2]: [min#703, max#704]
+Keys: []
+Functions [2]: [min(time#589), max(time#589)]
+Aggregate Attributes [2]: [min(time#589)#475, max(time#589)#476]
+Results [2]: [min(time#589)#475 AS start#592, max(time#589)#476 AS end#593]
+
+(86) Generate
+Input [2]: [start#592, end#593]
+Arguments: explode(sequence(start#592, end#593, Some(INTERVAL '01' MINUTE), Some(UTC))), false, [minute#594]
+
+(87) Scan parquet
+Output [3]: [time#595, open#596, close#597]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+PushedFilters: [IsNotNull(time)]
+ReadSchema: struct<time:timestamp,open:double,close:double>
+
+(88) Filter
+Input [3]: [time#595, open#596, close#597]
+Condition : isnotnull(time#595)
+
+(89) HashAggregate
+Input [3]: [time#595, open#596, close#597]
+Keys [3]: [time#595, knownfloatingpointnormalized(normalizenanandzero(open#596)) AS open#596, knownfloatingpointnormalized(normalizenanandzero(close#597)) AS close#597]
+Functions: []
+Aggregate Attributes: []
+Results [3]: [time#595, open#596, close#597]
+
+(90) Exchange
+Input [3]: [time#595, open#596, close#597]
+Arguments: hashpartitioning(time#595, open#596, close#597, 200), ENSURE_REQUIREMENTS, [plan_id=4689]
+
+(91) HashAggregate
+Input [3]: [time#595, open#596, close#597]
+Keys [3]: [time#595, open#596, close#597]
+Functions: []
+Aggregate Attributes: []
+Results [2]: [time#595, open#596]
+
+(92) BroadcastExchange
+Input [2]: [time#595, open#596]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, true]),false), [plan_id=4692]
+
+(93) BroadcastHashJoin
+Left keys [1]: [minute#594]
+Right keys [1]: [time#595]
+Join type: LeftOuter
+Join condition: None
+
+(94) Project
+Output [2]: [minute#594 AS _spot_minute#587, open#596 AS spot_plus_5m#588]
+Input [3]: [minute#594, time#595, open#596]
+
+(95) BroadcastExchange
+Input [2]: [_spot_minute#587, spot_plus_5m#588]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, false]),false), [plan_id=4696]
+
+(96) BroadcastHashJoin
+Left keys [1]: [date_trunc(minute, ts#500 + INTERVAL '05' MINUTE, Some(UTC))]
+Right keys [1]: [_spot_minute#587]
+Join type: LeftOuter
+Join condition: None
+
+(97) Project
+Output [18]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588]
+Input [19]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, _spot_minute#587, spot_plus_5m#588]
+
+(98) Scan parquet
+Output [1]: [time#617]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+ReadSchema: struct<time:timestamp>
+
+(99) HashAggregate
+Input [1]: [time#617]
+Keys: []
+Functions [2]: [partial_min(time#617), partial_max(time#617)]
+Aggregate Attributes [2]: [min#705, max#706]
+Results [2]: [min#707, max#708]
+
+(100) Exchange
+Input [2]: [min#707, max#708]
+Arguments: SinglePartition, ENSURE_REQUIREMENTS, [plan_id=4699]
+
+(101) HashAggregate
+Input [2]: [min#707, max#708]
+Keys: []
+Functions [2]: [min(time#617), max(time#617)]
+Aggregate Attributes [2]: [min(time#617)#475, max(time#617)#476]
+Results [2]: [min(time#617)#475 AS start#620, max(time#617)#476 AS end#621]
+
+(102) Generate
+Input [2]: [start#620, end#621]
+Arguments: explode(sequence(start#620, end#621, Some(INTERVAL '01' MINUTE), Some(UTC))), false, [minute#622]
+
+(103) Scan parquet
+Output [3]: [time#623, open#624, close#625]
+Batched: true
+Location: InMemoryFileIndex [file:/mnt/c/Users/pikal/adverse-selection-lab/data/backfill/spot/ETH-USD_1m.parquet]
+PushedFilters: [IsNotNull(time)]
+ReadSchema: struct<time:timestamp,open:double,close:double>
+
+(104) Filter
+Input [3]: [time#623, open#624, close#625]
+Condition : isnotnull(time#623)
+
+(105) HashAggregate
+Input [3]: [time#623, open#624, close#625]
+Keys [3]: [time#623, knownfloatingpointnormalized(normalizenanandzero(open#624)) AS open#624, knownfloatingpointnormalized(normalizenanandzero(close#625)) AS close#625]
+Functions: []
+Aggregate Attributes: []
+Results [3]: [time#623, open#624, close#625]
+
+(106) Exchange
+Input [3]: [time#623, open#624, close#625]
+Arguments: hashpartitioning(time#623, open#624, close#625, 200), ENSURE_REQUIREMENTS, [plan_id=4702]
+
+(107) HashAggregate
+Input [3]: [time#623, open#624, close#625]
+Keys [3]: [time#623, open#624, close#625]
+Functions: []
+Aggregate Attributes: []
+Results [2]: [time#623, open#624]
+
+(108) BroadcastExchange
+Input [2]: [time#623, open#624]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, true]),false), [plan_id=4705]
+
+(109) BroadcastHashJoin
+Left keys [1]: [minute#622]
+Right keys [1]: [time#623]
+Join type: LeftOuter
+Join condition: None
+
+(110) Project
+Output [2]: [minute#622 AS _spot_minute#615, open#624 AS spot_plus_15m#616]
+Input [3]: [minute#622, time#623, open#624]
+
+(111) BroadcastExchange
+Input [2]: [_spot_minute#615, spot_plus_15m#616]
+Arguments: HashedRelationBroadcastMode(List(input[0, timestamp, false]),false), [plan_id=4709]
+
+(112) BroadcastHashJoin
+Left keys [1]: [date_trunc(minute, ts#500 + INTERVAL '15' MINUTE, Some(UTC))]
+Right keys [1]: [_spot_minute#615]
+Join type: LeftOuter
+Join condition: None
+
+(113) Project
+Output [21]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588, spot_plus_15m#616, (cast(yes_price#420L as double) / 10000.0) AS price#643, (cast(count#421L as double) / 100.0) AS qty#644, CASE WHEN (taker_outcome_side#422 = yes) THEN -1.0 ELSE 1.0 END AS maker_sign#645, (cast((unix_micros(close_time#457) - unix_micros(ts#500)) as double) / 6.0E7) AS tau_min#646]
+Input [20]: [trade_id#417, ticker#418, yes_price#420L, count#421L, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588, _spot_minute#615, spot_plus_15m#616]
+
+(114) ArrowEvalPython
+Input [21]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646]
+Arguments: [norm_cdf(CASE WHEN ((((((((isnotnull(spot#502) AND isnotnull(floor_strike#455)) AND NOT isnan(spot#502)) AND NOT isnan(floor_strike#455)) AND (spot#502 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) AND ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646))) THEN ((ln((spot#502 / floor_strike#455)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646))) END)#647, norm_cdf(CASE WHEN ((((((((isnotnull(spot#502) AND isnotnull(cap_strike#456)) AND NOT isnan(spot#502)) AND NOT isnan(cap_strike#456)) AND (spot#502 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) AND ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646))) THEN ((ln((spot#502 / cap_strike#456)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646))) END)#648], [pythonUDF0#673, pythonUDF1#674], 200
+
+(115) Project
+Output [22]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, CASE WHEN (isnotnull(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(floor_strike#455)) AND NOT isnan(spot#502)) AND NOT isnan(floor_strike#455)) AND (spot#502 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#673 ELSE CASE WHEN (spot#502 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(cap_strike#456)) AND NOT isnan(spot#502)) AND NOT isnan(cap_strike#456)) AND (spot#502 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#674 ELSE CASE WHEN (spot#502 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(floor_strike#455)) AND NOT isnan(spot#502)) AND NOT isnan(floor_strike#455)) AND (spot#502 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#673 ELSE CASE WHEN (spot#502 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(cap_strike#456)) AND NOT isnan(spot#502)) AND NOT isnan(cap_strike#456)) AND (spot#502 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#674 ELSE CASE WHEN (spot#502 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END) AND NOT isnan(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(floor_strike#455)) AND NOT isnan(spot#502)) AND NOT isnan(floor_strike#455)) AND (spot#502 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#673 ELSE CASE WHEN (spot#502 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(cap_strike#456)) AND NOT isnan(spot#502)) AND NOT isnan(cap_strike#456)) AND (spot#502 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#674 ELSE CASE WHEN (spot#502 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(floor_strike#455)) AND NOT isnan(spot#502)) AND NOT isnan(floor_strike#455)) AND (spot#502 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#673 ELSE CASE WHEN (spot#502 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(cap_strike#456)) AND NOT isnan(spot#502)) AND NOT isnan(cap_strike#456)) AND (spot#502 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#674 ELSE CASE WHEN (spot#502 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) THEN least(1.0, greatest(0.0, CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(floor_strike#455)) AND NOT isnan(spot#502)) AND NOT isnan(floor_strike#455)) AND (spot#502 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#673 ELSE CASE WHEN (spot#502 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(cap_strike#456)) AND NOT isnan(spot#502)) AND NOT isnan(cap_strike#456)) AND (spot#502 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#674 ELSE CASE WHEN (spot#502 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(floor_strike#455)) AND NOT isnan(spot#502)) AND NOT isnan(floor_strike#455)) AND (spot#502 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#673 ELSE CASE WHEN (spot#502 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot#502) AND isnotnull(cap_strike#456)) AND NOT isnan(spot#502)) AND NOT isnan(cap_strike#456)) AND (spot#502 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot#502) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#674 ELSE CASE WHEN (spot#502 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) END AS fv#649]
+Input [23]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, pythonUDF0#673, pythonUDF1#674]
+
+(116) ArrowEvalPython
+Input [22]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649]
+Arguments: [norm_cdf(CASE WHEN ((((((((isnotnull(spot_minus_1m#504) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(floor_strike#455)) AND (spot_minus_1m#504 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) AND ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646))) THEN ((ln((spot_minus_1m#504 / floor_strike#455)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646))) END)#652, norm_cdf(CASE WHEN ((((((((isnotnull(spot_minus_1m#504) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(cap_strike#456)) AND (spot_minus_1m#504 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) AND ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646))) THEN ((ln((spot_minus_1m#504 / cap_strike#456)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646))) END)#653, norm_cdf(CASE WHEN ((((((((isnotnull(spot_minus_5m#532) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(floor_strike#455)) AND (spot_minus_5m#532 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) AND ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646))) THEN ((ln((spot_minus_5m#532 / floor_strike#455)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646))) END)#655, norm_cdf(CASE WHEN ((((((((isnotnull(spot_minus_5m#532) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(cap_strike#456)) AND (spot_minus_5m#532 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) AND ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646))) THEN ((ln((spot_minus_5m#532 / cap_strike#456)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646)))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT(tau_min#646))) END)#656, norm_cdf(CASE WHEN ((((((((isnotnull(spot_plus_1m#560) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(floor_strike#455)) AND (spot_plus_1m#560 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) AND (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0)))) THEN ((ln((spot_plus_1m#560 / floor_strike#455)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 1.0))) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 1.0))))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 1.0)))) END)#658, norm_cdf(CASE WHEN ((((((((isnotnull(spot_plus_1m#560) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(cap_strike#456)) AND (spot_plus_1m#560 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) AND (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0)))) THEN ((ln((spot_plus_1m#560 / cap_strike#456)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 1.0))) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 1.0))))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 1.0)))) END)#659], [pythonUDF0#675, pythonUDF1#676, pythonUDF2#677, pythonUDF3#678, pythonUDF4#679, pythonUDF5#680], 200
+
+(117) Project
+Output [24]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, (maker_sign#645 * (fv#649 - price#643)) AS maker_edge#650, (maker_sign#645 * (settle_yes#458 - price#643)) AS mo_settle#651, (-maker_sign#645 * (fv#649 - CASE WHEN (isnotnull(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(floor_strike#455)) AND (spot_minus_1m#504 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#675 ELSE CASE WHEN (spot_minus_1m#504 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(cap_strike#456)) AND (spot_minus_1m#504 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#676 ELSE CASE WHEN (spot_minus_1m#504 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(floor_strike#455)) AND (spot_minus_1m#504 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#675 ELSE CASE WHEN (spot_minus_1m#504 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(cap_strike#456)) AND (spot_minus_1m#504 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#676 ELSE CASE WHEN (spot_minus_1m#504 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END) AND NOT isnan(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(floor_strike#455)) AND (spot_minus_1m#504 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#675 ELSE CASE WHEN (spot_minus_1m#504 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(cap_strike#456)) AND (spot_minus_1m#504 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#676 ELSE CASE WHEN (spot_minus_1m#504 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(floor_strike#455)) AND (spot_minus_1m#504 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#675 ELSE CASE WHEN (spot_minus_1m#504 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(cap_strike#456)) AND (spot_minus_1m#504 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#676 ELSE CASE WHEN (spot_minus_1m#504 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) THEN least(1.0, greatest(0.0, CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(floor_strike#455)) AND (spot_minus_1m#504 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#675 ELSE CASE WHEN (spot_minus_1m#504 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(cap_strike#456)) AND (spot_minus_1m#504 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#676 ELSE CASE WHEN (spot_minus_1m#504 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(floor_strike#455)) AND (spot_minus_1m#504 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF0#675 ELSE CASE WHEN (spot_minus_1m#504 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_minus_1m#504) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_1m#504)) AND NOT isnan(cap_strike#456)) AND (spot_minus_1m#504 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_1m#504) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF1#676 ELSE CASE WHEN (spot_minus_1m#504 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) END)) AS stale_move_1m#654, (-maker_sign#645 * (fv#649 - CASE WHEN (isnotnull(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(floor_strike#455)) AND (spot_minus_5m#532 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF2#677 ELSE CASE WHEN (spot_minus_5m#532 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(cap_strike#456)) AND (spot_minus_5m#532 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF3#678 ELSE CASE WHEN (spot_minus_5m#532 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(floor_strike#455)) AND (spot_minus_5m#532 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF2#677 ELSE CASE WHEN (spot_minus_5m#532 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(cap_strike#456)) AND (spot_minus_5m#532 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF3#678 ELSE CASE WHEN (spot_minus_5m#532 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END) AND NOT isnan(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(floor_strike#455)) AND (spot_minus_5m#532 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF2#677 ELSE CASE WHEN (spot_minus_5m#532 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(cap_strike#456)) AND (spot_minus_5m#532 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF3#678 ELSE CASE WHEN (spot_minus_5m#532 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(floor_strike#455)) AND (spot_minus_5m#532 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF2#677 ELSE CASE WHEN (spot_minus_5m#532 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(cap_strike#456)) AND (spot_minus_5m#532 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF3#678 ELSE CASE WHEN (spot_minus_5m#532 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) THEN least(1.0, greatest(0.0, CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(floor_strike#455)) AND (spot_minus_5m#532 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF2#677 ELSE CASE WHEN (spot_minus_5m#532 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(cap_strike#456)) AND (spot_minus_5m#532 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF3#678 ELSE CASE WHEN (spot_minus_5m#532 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(floor_strike#455)) AND (spot_minus_5m#532 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF2#677 ELSE CASE WHEN (spot_minus_5m#532 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_minus_5m#532) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_minus_5m#532)) AND NOT isnan(cap_strike#456)) AND (spot_minus_5m#532 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_minus_5m#532) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN ((tau_min#646 > 0.0) AND NOT isnan(tau_min#646)) THEN pythonUDF3#678 ELSE CASE WHEN (spot_minus_5m#532 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) END)) AS stale_move_5m#657, CASE WHEN ((tau_min#646 - 1.0) <= 0.0) THEN settle_yes#458 ELSE CASE WHEN (isnotnull(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(floor_strike#455)) AND (spot_plus_1m#560 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF4#679 ELSE CASE WHEN (spot_plus_1m#560 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(cap_strike#456)) AND (spot_plus_1m#560 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF5#680 ELSE CASE WHEN (spot_plus_1m#560 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(floor_strike#455)) AND (spot_plus_1m#560 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF4#679 ELSE CASE WHEN (spot_plus_1m#560 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(cap_strike#456)) AND (spot_plus_1m#560 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF5#680 ELSE CASE WHEN (spot_plus_1m#560 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END) AND NOT isnan(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(floor_strike#455)) AND (spot_plus_1m#560 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF4#679 ELSE CASE WHEN (spot_plus_1m#560 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(cap_strike#456)) AND (spot_plus_1m#560 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF5#680 ELSE CASE WHEN (spot_plus_1m#560 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(floor_strike#455)) AND (spot_plus_1m#560 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF4#679 ELSE CASE WHEN (spot_plus_1m#560 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(cap_strike#456)) AND (spot_plus_1m#560 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF5#680 ELSE CASE WHEN (spot_plus_1m#560 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) THEN least(1.0, greatest(0.0, CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(floor_strike#455)) AND (spot_plus_1m#560 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF4#679 ELSE CASE WHEN (spot_plus_1m#560 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(cap_strike#456)) AND (spot_plus_1m#560 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF5#680 ELSE CASE WHEN (spot_plus_1m#560 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(floor_strike#455)) AND (spot_plus_1m#560 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF4#679 ELSE CASE WHEN (spot_plus_1m#560 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_1m#560) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_1m#560)) AND NOT isnan(cap_strike#456)) AND (spot_plus_1m#560 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_1m#560) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 1.0) > 0.0) AND NOT isnan((tau_min#646 - 1.0))) THEN pythonUDF5#680 ELSE CASE WHEN (spot_plus_1m#560 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) END END AS _fv_1m#660]
+Input [28]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_minus_1m#504, spot_minus_5m#532, spot_plus_1m#560, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, pythonUDF0#675, pythonUDF1#676, pythonUDF2#677, pythonUDF3#678, pythonUDF4#679, pythonUDF5#680]
+
+(118) ArrowEvalPython
+Input [24]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, maker_edge#650, mo_settle#651, stale_move_1m#654, stale_move_5m#657, _fv_1m#660]
+Arguments: [norm_cdf(CASE WHEN ((((((((isnotnull(spot_plus_5m#588) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(floor_strike#455)) AND (spot_plus_5m#588 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) AND (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0)))) THEN ((ln((spot_plus_5m#588 / floor_strike#455)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 5.0))) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 5.0))))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 5.0)))) END)#663, norm_cdf(CASE WHEN ((((((((isnotnull(spot_plus_5m#588) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(cap_strike#456)) AND (spot_plus_5m#588 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) AND (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0)))) THEN ((ln((spot_plus_5m#588 / cap_strike#456)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 5.0))) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 5.0))))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 5.0)))) END)#664], [pythonUDF0#681, pythonUDF1#682], 200
+
+(119) Project
+Output [25]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, maker_edge#650, mo_settle#651, stale_move_1m#654, stale_move_5m#657, (maker_sign#645 * (_fv_1m#660 - price#643)) AS mo_1m#661, (maker_sign#645 * (_fv_1m#660 - fv#649)) AS move_1m#662, CASE WHEN ((tau_min#646 - 5.0) <= 0.0) THEN settle_yes#458 ELSE CASE WHEN (isnotnull(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(floor_strike#455)) AND (spot_plus_5m#588 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF0#681 ELSE CASE WHEN (spot_plus_5m#588 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(cap_strike#456)) AND (spot_plus_5m#588 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF1#682 ELSE CASE WHEN (spot_plus_5m#588 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(floor_strike#455)) AND (spot_plus_5m#588 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF0#681 ELSE CASE WHEN (spot_plus_5m#588 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(cap_strike#456)) AND (spot_plus_5m#588 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF1#682 ELSE CASE WHEN (spot_plus_5m#588 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END) AND NOT isnan(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(floor_strike#455)) AND (spot_plus_5m#588 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF0#681 ELSE CASE WHEN (spot_plus_5m#588 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(cap_strike#456)) AND (spot_plus_5m#588 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF1#682 ELSE CASE WHEN (spot_plus_5m#588 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(floor_strike#455)) AND (spot_plus_5m#588 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF0#681 ELSE CASE WHEN (spot_plus_5m#588 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(cap_strike#456)) AND (spot_plus_5m#588 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF1#682 ELSE CASE WHEN (spot_plus_5m#588 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) THEN least(1.0, greatest(0.0, CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(floor_strike#455)) AND (spot_plus_5m#588 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF0#681 ELSE CASE WHEN (spot_plus_5m#588 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(cap_strike#456)) AND (spot_plus_5m#588 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF1#682 ELSE CASE WHEN (spot_plus_5m#588 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(floor_strike#455)) AND (spot_plus_5m#588 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF0#681 ELSE CASE WHEN (spot_plus_5m#588 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_5m#588) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_5m#588)) AND NOT isnan(cap_strike#456)) AND (spot_plus_5m#588 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_5m#588) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 5.0) > 0.0) AND NOT isnan((tau_min#646 - 5.0))) THEN pythonUDF1#682 ELSE CASE WHEN (spot_plus_5m#588 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) END END AS _fv_5m#665]
+Input [26]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_plus_5m#588, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, maker_edge#650, mo_settle#651, stale_move_1m#654, stale_move_5m#657, _fv_1m#660, pythonUDF0#681, pythonUDF1#682]
+
+(120) ArrowEvalPython
+Input [25]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, maker_edge#650, mo_settle#651, stale_move_1m#654, stale_move_5m#657, mo_1m#661, move_1m#662, _fv_5m#665]
+Arguments: [norm_cdf(CASE WHEN ((((((((isnotnull(spot_plus_15m#616) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(floor_strike#455)) AND (spot_plus_15m#616 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) AND (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0)))) THEN ((ln((spot_plus_15m#616 / floor_strike#455)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 15.0))) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 15.0))))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 15.0)))) END)#668, norm_cdf(CASE WHEN ((((((((isnotnull(spot_plus_15m#616) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(cap_strike#456)) AND (spot_plus_15m#616 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) AND (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0)))) THEN ((ln((spot_plus_15m#616 / cap_strike#456)) - (((CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 15.0))) * 0.5) * (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 15.0))))) / (CASE WHEN (isnotnull(sigma#487) AND NOT isnan(sigma#487)) THEN greatest(sigma#487, 1.0E-6) END * SQRT((tau_min#646 - 15.0)))) END)#669], [pythonUDF0#683, pythonUDF1#684], 200
+
+(121) Project
+Output [26]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, maker_edge#650, mo_settle#651, stale_move_1m#654, stale_move_5m#657, mo_1m#661, move_1m#662, (maker_sign#645 * (_fv_5m#665 - price#643)) AS mo_5m#666, (maker_sign#645 * (_fv_5m#665 - fv#649)) AS move_5m#667, CASE WHEN ((tau_min#646 - 15.0) <= 0.0) THEN settle_yes#458 ELSE CASE WHEN (isnotnull(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(floor_strike#455)) AND (spot_plus_15m#616 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF0#683 ELSE CASE WHEN (spot_plus_15m#616 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(cap_strike#456)) AND (spot_plus_15m#616 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF1#684 ELSE CASE WHEN (spot_plus_15m#616 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(floor_strike#455)) AND (spot_plus_15m#616 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF0#683 ELSE CASE WHEN (spot_plus_15m#616 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(cap_strike#456)) AND (spot_plus_15m#616 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF1#684 ELSE CASE WHEN (spot_plus_15m#616 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END) AND NOT isnan(CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(floor_strike#455)) AND (spot_plus_15m#616 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF0#683 ELSE CASE WHEN (spot_plus_15m#616 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(cap_strike#456)) AND (spot_plus_15m#616 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF1#684 ELSE CASE WHEN (spot_plus_15m#616 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(floor_strike#455)) AND (spot_plus_15m#616 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF0#683 ELSE CASE WHEN (spot_plus_15m#616 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(cap_strike#456)) AND (spot_plus_15m#616 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF1#684 ELSE CASE WHEN (spot_plus_15m#616 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) THEN least(1.0, greatest(0.0, CASE WHEN (strike_type#438 = greater) THEN CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(floor_strike#455)) AND (spot_plus_15m#616 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF0#683 ELSE CASE WHEN (spot_plus_15m#616 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END WHEN (strike_type#438 = less) THEN CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(cap_strike#456)) AND (spot_plus_15m#616 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN (1.0 - CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF1#684 ELSE CASE WHEN (spot_plus_15m#616 > cap_strike#456) THEN 1.0 ELSE 0.0 END END) END WHEN (strike_type#438 = between) THEN (CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(floor_strike#455)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(floor_strike#455)) AND (spot_plus_15m#616 > 0.0)) AND (floor_strike#455 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(floor_strike#455) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF0#683 ELSE CASE WHEN (spot_plus_15m#616 > floor_strike#455) THEN 1.0 ELSE 0.0 END END END - CASE WHEN (((((((isnotnull(spot_plus_15m#616) AND isnotnull(cap_strike#456)) AND NOT isnan(spot_plus_15m#616)) AND NOT isnan(cap_strike#456)) AND (spot_plus_15m#616 > 0.0)) AND (cap_strike#456 > 0.0)) AND NOT (abs(spot_plus_15m#616) = Infinity)) AND NOT (abs(cap_strike#456) = Infinity)) THEN CASE WHEN (((tau_min#646 - 15.0) > 0.0) AND NOT isnan((tau_min#646 - 15.0))) THEN pythonUDF1#684 ELSE CASE WHEN (spot_plus_15m#616 > cap_strike#456) THEN 1.0 ELSE 0.0 END END END) END)) END END AS _fv_15m#670]
+Input [27]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, spot_plus_15m#616, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, maker_edge#650, mo_settle#651, stale_move_1m#654, stale_move_5m#657, mo_1m#661, move_1m#662, _fv_5m#665, pythonUDF0#683, pythonUDF1#684]
+
+(122) Project
+Output [27]: [trade_id#417, ticker#418, event_ticker#437, ts#500, close_time#457, tau_min#646, strike_type#438, floor_strike#455, cap_strike#456, price#643, qty#644, taker_outcome_side#422, maker_sign#645, settle_yes#458, spot#502, sigma#487, fv#649, maker_edge#650, stale_move_1m#654, stale_move_5m#657, mo_settle#651, mo_1m#661, mo_5m#666, (maker_sign#645 * (_fv_15m#670 - price#643)) AS mo_15m#671, move_1m#662, move_5m#667, (maker_sign#645 * (_fv_15m#670 - fv#649)) AS move_15m#672]
+Input [26]: [trade_id#417, ticker#418, taker_outcome_side#422, event_ticker#437, strike_type#438, floor_strike#455, cap_strike#456, close_time#457, settle_yes#458, ts#500, spot#502, sigma#487, price#643, qty#644, maker_sign#645, tau_min#646, fv#649, maker_edge#650, mo_settle#651, stale_move_1m#654, stale_move_5m#657, mo_1m#661, move_1m#662, mo_5m#666, move_5m#667, _fv_15m#670]
+
+(123) AdaptiveSparkPlan
+Output [27]: [trade_id#417, ticker#418, event_ticker#437, ts#500, close_time#457, tau_min#646, strike_type#438, floor_strike#455, cap_strike#456, price#643, qty#644, taker_outcome_side#422, maker_sign#645, settle_yes#458, spot#502, sigma#487, fv#649, maker_edge#650, stale_move_1m#654, stale_move_5m#657, mo_settle#651, mo_1m#661, mo_5m#666, mo_15m#671, move_1m#662, move_5m#667, move_15m#672]
+Arguments: isFinalPlan=false

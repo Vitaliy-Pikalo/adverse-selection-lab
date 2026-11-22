@@ -16,7 +16,9 @@ import signal
 import statistics
 import subprocess
 import sys
+import tarfile
 import time
+from contextlib import ExitStack
 from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -25,6 +27,10 @@ ROOT = Path(__file__).resolve().parents[1]
 ROWS = {"KXBTC": 1010733, "KXETH": 110811}
 FILES = {"KXBTC": 704, "KXETH": 693}
 ORDER = ("pandas", "spark", "spark", "pandas", "pandas", "spark")
+COMPARISON_ORDER = (
+    "pandas", "spark_baseline", "spark", "spark", "pandas", "spark_baseline",
+    "spark_baseline", "spark", "pandas",
+)
 CODE_FILES = (
     "src/asl/markouts.py", "src/asl/pricer.py", "src/asl/fixed.py",
     "spark/session.py", "spark/ingestion.py", "spark/spot.py", "spark/pricer.py",
@@ -179,12 +185,18 @@ def validate_output(output: Path) -> dict:
     return result
 
 
-def execute(command: list[str], log: Path, engine: str, number: int) -> float:
+def execute(
+    command: list[str], log: Path, engine: str, number: int, *, cwd: Path = ROOT,
+) -> float:
     """Time process launch through exit, including worker imports and shutdown."""
     with log.open("w", encoding="utf-8") as stream:
+        environment = dict(os.environ)
+        environment["PYTHONPATH"] = (
+            str(cwd / "src") + os.pathsep + environment.get("PYTHONPATH", "")
+        )
         started = time.perf_counter()
-        process = subprocess.Popen(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT,
-                                   start_new_session=True)
+        process = subprocess.Popen(command, cwd=cwd, stdout=stream, stderr=subprocess.STDOUT,
+                                   start_new_session=True, env=environment)
         try:
             while True:
                 try:
@@ -214,12 +226,13 @@ def run(args) -> None:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     directory = ROOT / "spark" / "benchmarks" / stamp
     directory.mkdir(parents=True, exist_ok=False)
+    order = COMPARISON_ORDER if args.baseline_ref else ORDER
     report = {
         "status": "RUNNING", "started_utc": datetime.now(UTC).isoformat(),
         "command": shlex.join([sys.executable, "-B", "-m", "spark.benchmark", *sys.argv[1:]]),
         "backfill": str(backfill), "machine": machine_info(), "runs": [],
         "protocol": {
-            "order": list(ORDER), "runs_per_engine": 3, "fresh_process_per_run": True,
+            "order": list(order), "runs_per_engine": 3, "fresh_process_per_run": True,
             "includes": ["imports", "Spark startup", "input reads", "engine validation",
                          "spot preparation", "joins", "labels", "Snappy Parquet write",
                          "Spark stop and Python exit"],
@@ -227,6 +240,7 @@ def run(args) -> None:
                          "bootstrap summaries", "parity comparison"],
             "cache": "All input bytes hashed before timing; OS caches not flushed; no JVM reuse",
             "output_filesystem": "/var/tmp (Linux disk); native file layout per engine",
+            "source_import_path": "Each worker prepends its checkout's src directory to PYTHONPATH",
         },
     }
     print(f"REPORT_DIRECTORY {directory}", flush=True)
@@ -237,68 +251,115 @@ def run(args) -> None:
     code_hashes = {name: sha256(ROOT / name) for name in CODE_FILES}
     report["code_sha256"] = code_hashes
     write_json(directory / "results.json", report)
-    counters = {"pandas": 0, "spark": 0}
-    try:
-        for engine in ORDER:
-            counters[engine] += 1
-            number = counters[engine]
-            label = f"{engine}_{number}"
-            log = directory / f"{label}.log"
-            before = memory_snapshot()
-            with TemporaryDirectory(prefix="asl-benchmark-", dir="/var/tmp") as temp:
-                root = Path(temp)
-                command = [
-                    sys.executable, "-B", "-m", "spark.benchmark", "worker",
-                    "--engine", engine, "--backfill", str(backfill),
-                    "--output", str(root / "labels"), "--receipt", str(root / "worker.json"),
-                ]
-                print(f"START {engine} #{number}: {shlex.join(command)}", flush=True)
-                elapsed = execute(command, log, engine, number)
-                after = memory_snapshot()
-                receipt = json.loads((root / "worker.json").read_text())
-                assert receipt["engine"] == engine and receipt["status"] == "PASS"
-                outputs = validate_output(root / "labels")
-                if report["runs"]:
-                    for series in ROWS:
-                        assert outputs[series]["columns"] == report["runs"][0]["outputs"][series][
-                            "columns"
-                        ]
-                report["runs"].append({
-                    "engine": engine, "number": number, "wall_seconds": elapsed,
-                    "command": command, "log": log.name, "worker": receipt, "outputs": outputs,
-                    "memory_before": before, "memory_after": after,
-                })
-                write_json(directory / "results.json", report)
-            print(f"DONE {engine} #{number}: {elapsed:.6f}s (output counts/schema PASS)",
-                  flush=True)
-        print("Rehashing inputs and checking engine code after all runs", flush=True)
-        assert input_manifest(backfill)["digest"] == manifest["digest"], "Input data changed"
-        final_hashes = {name: sha256(ROOT / name) for name in CODE_FILES}
-        assert final_hashes == code_hashes, "Engine code changed"
-        medians = {
-            engine: statistics.median(item["wall_seconds"] for item in report["runs"]
-                                      if item["engine"] == engine)
-            for engine in counters
-        }
-        report.update({"status": "PASS", "finished_utc": datetime.now(UTC).isoformat(),
-                       "median_seconds": medians,
-                       "spark_over_pandas_ratio": medians["spark"] / medians["pandas"],
-                       "inputs_unchanged": True, "engine_code_unchanged": True})
-    except BaseException as error:
-        report.update({"status": "FAILED", "error": f"{type(error).__name__}: {error}"})
-        write_json(directory / "results.json", report)
-        raise
+    counters = dict.fromkeys(order, 0)
+    with ExitStack() as stack:
+        roots = dict.fromkeys(counters, ROOT)
+        baseline_hashes = None
+        if args.baseline_ref:
+            baseline_sha = subprocess.check_output(
+                ["git", "rev-parse", "--verify", args.baseline_ref + "^{commit}"],
+                cwd=ROOT, text=True,
+            ).strip()
+            snapshot_parent = ROOT / "data" / "spark-port"
+            snapshot_parent.mkdir(parents=True, exist_ok=True)
+            snapshot = Path(stack.enter_context(TemporaryDirectory(
+                prefix="benchmark-baseline-", dir=snapshot_parent,
+            )))
+            archive = snapshot / "snapshot.tar"
+            with archive.open("wb") as stream:
+                subprocess.run(
+                    ["git", "archive", baseline_sha], cwd=ROOT, stdout=stream, check=True,
+                )
+            with tarfile.open(archive) as bundle:
+                bundle.extractall(snapshot, filter="data")
+            archive.unlink()
+            roots["spark_baseline"] = snapshot
+            baseline_hashes = {name: sha256(snapshot / name) for name in CODE_FILES}
+            report["baseline"] = {
+                "git_ref": args.baseline_ref, "git_commit": baseline_sha,
+                "code_sha256": baseline_hashes,
+                "code_storage": "temporary snapshot on the repository filesystem (data/spark-port)",
+            }
+        try:
+            run_trials(report, directory, backfill, order, counters, roots)
+            print("Rehashing inputs and checking engine code after all runs", flush=True)
+            assert input_manifest(backfill)["digest"] == manifest["digest"], "Input data changed"
+            final_hashes = {name: sha256(ROOT / name) for name in CODE_FILES}
+            assert final_hashes == code_hashes, "Engine code changed"
+            if baseline_hashes is not None:
+                assert {
+                    name: sha256(roots["spark_baseline"] / name) for name in CODE_FILES
+                } == baseline_hashes, "Baseline code changed"
+            medians = {
+                engine: statistics.median(item["wall_seconds"] for item in report["runs"]
+                                          if item["engine"] == engine)
+                for engine in counters
+            }
+            report.update({"status": "PASS", "finished_utc": datetime.now(UTC).isoformat(),
+                           "median_seconds": medians,
+                           "spark_over_pandas_ratio": medians["spark"] / medians["pandas"],
+                           "inputs_unchanged": True, "engine_code_unchanged": True})
+            if "spark_baseline" in medians:
+                report["baseline_over_optimized_ratio"] = (
+                    medians["spark_baseline"] / medians["spark"]
+                )
+                report["optimized_latency_reduction_percent"] = 100 * (
+                    1 - medians["spark"] / medians["spark_baseline"]
+                )
+        except BaseException as error:
+            report.update({"status": "FAILED", "error": f"{type(error).__name__}: {error}"})
+            write_json(directory / "results.json", report)
+            raise
     write_json(directory / "results.json", report)
     print("BENCHMARK_RESULT " + json.dumps({key: report[key] for key in (
         "status", "median_seconds", "spark_over_pandas_ratio", "inputs_unchanged",
     )}), flush=True)
 
 
+def run_trials(report, directory, backfill, order, counters, roots) -> None:
+    for engine in order:
+        counters[engine] += 1
+        number = counters[engine]
+        label = f"{engine}_{number}"
+        log = directory / f"{label}.log"
+        before = memory_snapshot()
+        with TemporaryDirectory(prefix="asl-benchmark-", dir="/var/tmp") as temp:
+            root = Path(temp)
+            actual_engine = "spark" if engine == "spark_baseline" else engine
+            command = [
+                sys.executable, "-B", "-m", "spark.benchmark", "worker",
+                "--engine", actual_engine, "--backfill", str(backfill),
+                "--output", str(root / "labels"), "--receipt", str(root / "worker.json"),
+            ]
+            print(f"START {engine} #{number}: {shlex.join(command)}", flush=True)
+            elapsed = execute(command, log, engine, number, cwd=roots[engine])
+            after = memory_snapshot()
+            receipt = json.loads((root / "worker.json").read_text())
+            assert receipt["engine"] == actual_engine and receipt["status"] == "PASS"
+            outputs = validate_output(root / "labels")
+            if report["runs"]:
+                for series in ROWS:
+                    assert outputs[series]["columns"] == report["runs"][0]["outputs"][series][
+                        "columns"
+                    ]
+            report["runs"].append({
+                "engine": engine, "number": number, "wall_seconds": elapsed,
+                "command": command, "cwd": str(roots[engine]), "log": log.name,
+                "worker": receipt, "outputs": outputs,
+                "memory_before": before, "memory_after": after,
+            })
+            write_json(directory / "results.json", report)
+        print(f"DONE {engine} #{number}: {elapsed:.6f}s (output counts/schema PASS)", flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="action", required=True)
-    parent = subparsers.add_parser("run", help="Run the fixed six-command protocol")
+    parent = subparsers.add_parser(
+        "run", help="Run six trials, or nine with a frozen Spark control",
+    )
     parent.add_argument("--backfill", type=Path, default=ROOT / "data" / "backfill")
+    parent.add_argument("--baseline-ref", help="Interleave three Spark control runs from a Git ref")
     child = subparsers.add_parser("worker", help="Internal single-engine command")
     child.add_argument("--engine", choices=["pandas", "spark"], required=True)
     child.add_argument("--backfill", type=Path, required=True)
