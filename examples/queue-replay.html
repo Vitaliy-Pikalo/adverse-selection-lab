@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Adverse Selection Lab · Queue replay</title>
+<style>
+:root{color-scheme:dark;font:16px/1.5 "Inter",system-ui,sans-serif;background:#101820;color:#e8eff1}*{box-sizing:border-box}body{max-width:1060px;margin:auto;padding:32px 20px}header{border-bottom:1px solid #52616b;padding-bottom:18px}h1{font-size:clamp(32px,5vw,56px);letter-spacing:-.045em;margin:8px 0}h2{font-size:18px;margin:0 0 14px}p{color:#b9cbd0;margin:8px 0}.tag{color:#91dbc6;font:14px monospace}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}section{padding:18px;background:#19252e;border:1px solid #374954;border-radius:8px}form,.actions{display:flex;gap:10px;align-items:end;flex-wrap:wrap}label{display:grid;font-size:13px;color:#b9cbd0}input,select,button{border:1px solid #617581;border-radius:4px;background:#111d25;color:#edf5f5;padding:8px;font:inherit}input{width:100px}button{cursor:pointer}button.primary{background:#a4ebce;color:#132a28;font-weight:650}button:disabled{opacity:.45;cursor:default}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}td,th{padding:6px 3px;text-align:right;border-bottom:1px solid #35444e}th{font-size:12px;color:#b9cbd0}th:first-child,td:first-child{text-align:left}.bid{color:#9ce6c4}.ask{color:#f6b099}li{padding:3px 0}ol{margin-bottom:0;padding-left:28px}.wide{grid-column:1/-1}@media(max-width:700px){.grid{grid-template-columns:1fr}body{padding:16px 10px}section{padding:12px}}
+</style>
+<header><span class="tag">ADVERSE SELECTION LAB / SIMULATOR</span><h1>Queue replay</h1><p>Join the 49¢ bid for 5 YES contracts. Step through the synthetic tape to watch your queue clear and measure your fill against the midpoint three events later.</p></header>
+<main class="grid"><section class="wide"><h2>Limit order</h2><form id="ticket"><label>Side<select id="side"><option value="buy">Buy YES</option><option value="sell">Sell YES</option></select></label><label>Limit (¢)<input id="price" type="number" min="1" max="99" value="49" required></label><label>Contracts<input id="qty" type="number" min="1" max="10000" value="5" required></label><button class="primary" id="place">Place order</button><button type="button" id="cancel">Cancel remainder</button></form><p id="status" role="status"></p></section>
+<section><h2>Order book</h2><table><thead><tr><th>Side</th><th>Price (¢)</th><th>Contracts</th></tr></thead><tbody id="depth"></tbody></table></section>
+<section><h2>Market replay</h2><p id="progress"></p><div class="actions"><button id="step" class="primary">Next event</button><button id="reset">Reset replay</button></div><ol id="events"></ol></section>
+<section class="wide"><h2>Your executions</h2><p>Signed markout = future midpoint minus fill price for a buy, reversed for a sell. Negative values mean the midpoint moved against your execution price. Fees excluded.</p><table><thead><tr><th>Event</th><th>Role</th><th>Qty</th><th>Fill (¢)</th><th>+3 events (¢)</th></tr></thead><tbody id="fills"></tbody></table></section></main>
+<script>
+"use strict";
+// One YES contract book. Prices are integer cents and sizes are whole contracts.
+class Book {
+  constructor() { this.orders = []; this.nextId = 1; }
+  levels(side) {
+    const priority = side === "buy" ? -1 : 1;
+    return this.orders.filter(o => o.side === side)
+      .sort((a,b) => priority * (a.price-b.price) || a.id-b.id);
+  }
+  cancel(id) { this.orders = this.orders.filter(o => o.id !== id); }
+  submit(side, price, qty) {
+    const id = this.nextId++, fills = [];
+    let left = qty;
+    for (const maker of this.levels(side === "buy" ? "sell" : "buy")) {
+      if (price !== null && (side === "buy" ? maker.price > price : maker.price < price)) break;
+      const size = Math.min(left, maker.qty);
+      fills.push({maker:maker.id,taker:id,price:maker.price,qty:size});
+      maker.qty -= size;
+      left -= size;
+      if (!maker.qty) this.cancel(maker.id);
+      if (!left) break;
+    }
+    if (price !== null && left) this.orders.push({side,price,qty:left,id});
+    return {id,fills};
+  }
+  midpoint() {
+    const bid = this.levels("buy")[0], ask = this.levels("sell")[0];
+    return bid && ask ? (bid.price + ask.price)/2 : null;
+  }
+}
+const tape = [
+  ["sell",null,6],["sell",null,7],["sell",null,4],["sell",49,8],
+  ["sell",null,6],["sell",48,10],["buy",null,4],["buy",47,7],
+  ["buy",null,8],["buy",49,5],["buy",null,6],["sell",51,9]
+];
+let book, clock, userId, userSide, executions, log;
+const el = id => document.getElementById(id);
+function submit(side,price,qty,personal=false) {
+  const result = book.submit(side,price,qty);
+  if (personal) { userId=result.id; userSide=side; }
+  for (const f of result.fills) {
+    if (f.maker === userId || f.taker === userId)
+      executions.push({...f, side:userSide, role:f.maker===userId?"Maker":"Taker", at:clock});
+  }
+}
+function advance() {
+  if(clock >= tape.length) return;
+  const [side,price,qty] = tape[clock++];
+  submit(side,price,qty);
+  log.push((side==="buy"?"Buy ":"Sell ") + qty + (price===null?" at market":" at "+price+"¢"));
+  for(const f of executions) if(f.at+3===clock) {
+    const mid=book.midpoint();
+    f.mark=mid===null ? null : (mid-f.price)*(f.side==="buy"?1:-1);
+  }
+  render();
+}
+function restart() {
+  book=new Book(); clock=0; userId=null; userSide=null; executions=[]; log=[];
+  for (const [s,p,q] of [["buy",49,10],["buy",48,6],["buy",47,12],["sell",51,10],["sell",52,8]])
+    submit(s,p,q);
+  render();
+}
+function render() {
+  const live=book.orders.find(o=>o.id===userId);
+  const ahead=live ? book.orders.filter(o=>o.side===live.side && o.price===live.price && o.id<live.id)
+    .reduce((sum,o)=>sum+o.qty,0) : 0;
+  el("status").textContent=live ? live.qty+" contracts resting · "+ahead+" contracts ahead at "+live.price+"¢"
+    : userId===null ? "Ready to place an order." : "Your order has no resting quantity.";
+  el("cancel").disabled=!live;
+  el("place").disabled=Boolean(live) || clock===tape.length;
+  el("step").disabled=clock===tape.length;
+  el("progress").textContent="Event "+clock+" of "+tape.length+" · Midpoint "+(book.midpoint()??"unavailable")+(book.midpoint()===null?"":"¢");
+  let rows="";
+  for (const side of ["sell","buy"]) {
+    const depth=new Map();
+    for(const o of book.levels(side)) depth.set(o.price,(depth.get(o.price)||0)+o.qty);
+    const levels=[...depth];
+    if(side==="sell") levels.reverse();
+    for(const [p,q] of levels) rows+="<tr><td class='"+(side==="sell"?"ask":"bid")+"'>"+(side==="sell"?"Ask":"Bid")+"</td><td>"+p+"</td><td>"+q+"</td></tr>";
+  }
+  el("depth").innerHTML=rows;
+  el("events").innerHTML=log.map(s=>"<li>"+s+"</li>").join("");
+  el("fills").innerHTML=executions.map(f=>{
+    const mark=f.mark===null?"No midpoint":f.mark!==undefined ? (f.mark>0?"+":"")+f.mark : clock===tape.length?"Beyond tape":"Pending";
+    return "<tr><td>"+f.at+"</td><td>"+f.role+"</td><td>"+f.qty+"</td><td>"+f.price+"</td><td>"+mark+"</td></tr>";
+  }).join("") || "<tr><td colspan='5'>Waiting for a fill</td></tr>";
+}
+el("ticket").onsubmit=e=>{
+  e.preventDefault();
+  if(el("place").disabled || !el("ticket").reportValidity()) return;
+  submit(el("side").value,Number(el("price").value),Number(el("qty").value),true);
+  render();
+};
+el("cancel").onclick=()=>{book.cancel(userId);render();};
+el("reset").onclick=restart;
+el("step").onclick=advance;
+restart();
+</script></html>
