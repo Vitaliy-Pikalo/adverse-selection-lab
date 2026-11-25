@@ -1,5 +1,13 @@
 # Adverse Selection Lab
 
+## Interactive execution replay
+
+[Download the BTC replay](https://raw.githubusercontent.com/Vitaliy-Pikalo/adverse-selection-lab/main/examples/btc-real-replay.html) and open the saved HTML in a browser. Choose a submission time or select **First fill** to see the displayed queue, modeled execution and midpoint on the same clock.
+
+On October 25, 2026, 13,999 overlapping paper orders across 92 BTC markets produced a fill on 53.4% of resting orders. At the 60-second deadline, mean value per submitted contract was −0.64¢ for an immediate buy and −0.15¢ for joining the bid. A resting order earned zero on unfilled quantity. Four markets in the recorder incident hour were excluded. These one-day figures exclude fees and latency.
+
+The interactive page shows the noon Eastern market. The simulation credits only trades at the original bid that consume the displayed queue. [Replay builder](examples/build_btc_replay.py) · [Kalshi Eye source data](https://huggingface.co/datasets/KalshiEye/kalshi-order-book-sample)
+
 Research question: on Kalshi BTC/ETH binary markets, is maker adverse selection driven mainly
 by quotes going stale relative to the underlying spot price, and does a quoting policy that
 reacts to that risk beat static and inventory-aware quoting under conservative fill assumptions?
